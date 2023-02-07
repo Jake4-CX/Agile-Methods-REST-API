@@ -9,15 +9,15 @@ export class ReportUpdates {
   id: number
 
   @ManyToOne(type => Users, user => user.id, { nullable: false })
-  user_id: number
+  user: number
 
   @ManyToOne(type => Reports, report => report.id, { nullable: false })
-  report_id: number
+  report: number
 
   @Column()
   report_update_text: string
 
-  @Column()
+  @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
   report_date: Date
 
   @Column()

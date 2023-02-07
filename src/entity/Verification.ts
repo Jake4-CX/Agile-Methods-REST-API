@@ -8,7 +8,7 @@ export class Verification {
     id: number
 
     @ManyToOne(type => Users, user => user.id, { nullable: false })
-    user_id: number
+    user: number
 
     @Column()
     verification_uuid: string

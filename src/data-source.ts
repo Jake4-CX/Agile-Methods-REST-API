@@ -1,5 +1,6 @@
 import "reflect-metadata"
 import { DataSource } from "typeorm"
+import { SnakeNamingStrategy } from "typeorm-naming-strategies"
 import { AccountRoles } from "./entity/AccountRoles"
 import { AssignedReports } from "./entity/AssignedReports"
 import { ImageGroups } from "./entity/ImageGroups"
@@ -11,15 +12,16 @@ import { Users } from "./entity/Users"
 import { Verification } from "./entity/Verification"
 
 export const AppDataSource = new DataSource({
-    type: "postgres",
+    type: "mariadb",
     host: "localhost",
-    port: 5432,
-    username: "postgres",
+    port: 3306,
+    username: "council_user",
     password: "4*CMgmdI6uv@",
-    database: "postgres",
+    database: "Reports",
     synchronize: true,
     logging: false,
     entities: [Users, AccountRoles, Verification, Reports, ReportTypes, ReportUpdates, AssignedReports, ImageGroups, Images],
     migrations: [],
     subscribers: [],
+    namingStrategy: new SnakeNamingStrategy(),
 })
