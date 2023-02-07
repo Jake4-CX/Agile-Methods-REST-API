@@ -8,5 +8,5 @@ export class ImageGroups {
   id: number
 
   @ManyToOne(type => Users, user => user.id, { nullable: false, onDelete: 'CASCADE' })
-  user_id: number
+  user: number
 }

@@ -8,7 +8,7 @@ export class Images {
   id: number
 
   @ManyToOne(type => ImageGroups, imageGroups => imageGroups.id, { nullable: false })
-  image_group_id: number
+  image_group: number
 
   @Column()
   image_uuid: string
@@ -16,6 +16,6 @@ export class Images {
   @Column()
   image_file_type: string
 
-  @Column()
+  @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
   upload_date: Date
 }

@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
 import { ImageGroups } from "./ImageGroups"
+import { ReportTypes } from "./ReportTypes"
 import { Users } from "./Users"
 
 @Entity()
@@ -11,8 +12,8 @@ export class Reports {
     @Column()
     report_uuid: string
 
-    @Column()
-    report_type_id: number
+    @ManyToOne(type => ReportTypes, reportType => reportType.id, { nullable: false })
+    report_type: number
 
     @Column()
     report_description: string
@@ -23,7 +24,7 @@ export class Reports {
     @Column()
     report_longitude: number
 
-    @Column()
+    @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
     report_date: Date
 
     @Column()
@@ -33,9 +34,9 @@ export class Reports {
     report_status: boolean
 
     @ManyToOne(type => ImageGroups, imageGroups => imageGroups.id, { nullable: false, onDelete: "CASCADE" })
-    image_group_id: number
+    image_group: number
 
     @ManyToOne(type => Users, user => user.id, { nullable: false })
-    user_id: number
+    user: number
 
 }

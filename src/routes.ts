@@ -37,8 +37,8 @@ export const Routes = [{
     authorization: false,
     allowed_roles: [],
     validation: [
-        body('email').isEmail().withMessage("email must be a valid email"),
-        body('password').isString().withMessage("password must be a string")
+        body('user_email').isEmail().withMessage("email must be a valid email"),
+        body('user_password').isString().withMessage("password must be a string")
     ]
 }, {
     method: "post",
@@ -48,10 +48,9 @@ export const Routes = [{
     authorization: false,
     allowed_roles: [],
     validation: [
-        body('email').isEmail().withMessage("email must be a valid email"),
-        body('password').isString().withMessage("password must be a string"),
-        body('firstName').isString().withMessage("firstName must be a string"),
-        body('lastName').isString().withMessage("lastName must be a string"),
-        body('age').isInt({min: 0}).withMessage("age must be a positive integer"),
+        body('user_email').isEmail().withMessage("email must be a valid email"),
+        body('user_password').isString().withMessage("password must be a string"),
+        body('first_name').isString().withMessage("firstName must be a string"),
+        body('last_name').isString().withMessage("lastName must be a string")
     ]
 }]

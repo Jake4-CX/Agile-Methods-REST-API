@@ -9,12 +9,12 @@ export class AssignedReports {
     id: number
 
     @ManyToOne(type => Reports, report => report.id, { nullable: false })
-    report_id: number
+    report: number
 
     @ManyToOne(type => Users, user => user.id, { nullable: false })
-    user_id: number
+    user: number
 
-    @Column()
+    @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
     assigned_date: Date
 
     @Column()

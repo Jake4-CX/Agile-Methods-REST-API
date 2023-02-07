@@ -22,13 +22,13 @@ export class Users {
     @Column()
     user_uuid: string
 
-    @Column()
+    @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
     registration_date: Date
 
-    @Column()
+    @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
     last_login_date: Date
 
     @ManyToOne(type => AccountRoles, account_role => account_role.id, { nullable: false })
-    account_role_id: AccountRoles
+    account_role: AccountRoles
 
 }

@@ -3,7 +3,7 @@ import { NextFunction, Request, Response } from "express"
 import { Users } from "../entity/Users"
 import * as jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
-import * as bcrypt from 'bcrypt';
+const bcrypt = require('bcrypt');
 
 export class UserController {
 
@@ -56,7 +56,10 @@ export class UserController {
         });
 
         if (!user) throw Error("user does not exist");
-        if (user.user_password !== user_password) throw Error("password is incorrect");
+
+        const passwordMatch = await bcrypt.compare(user_password, user.user_password);
+
+        if (!passwordMatch) throw Error("password is incorrect");
 
         delete user.user_password;
 
@@ -71,12 +74,13 @@ export class UserController {
 
         user_password = await bcrypt.hash(user_password, 10);
 
+        console.log("user_password: " + user_password);
+
         if (await this.userRepository.findOne({ where: { user_email } }) !== null) {
             throw Error("a user with this email already exists");
         }
 
         const user_uuid = uuidv4();
-        const date = Date.now();
 
         const user = Object.assign(new Users(), {
             user_email: user_email,
@@ -84,9 +88,7 @@ export class UserController {
             first_name: first_name,
             last_name: last_name,
             user_uuid: user_uuid,
-            registration_date: date,
-            last_login_date: date,
-            account_role_id: 0
+            account_role: 1
         });
 
         return this.userRepository.save(user)

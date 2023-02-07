@@ -6,6 +6,7 @@ import { Routes } from "./routes";
 import { validationResult } from "express-validator/src/validation-result";
 import { jwtAuthentication } from './middleware/JwtAuthentication';
 import { roleAuthentication } from "./middleware/roleAuthentication";
+const cors = require('cors');
 
 
 function handleError(err, req: Request, res: Response, next: Function) {
@@ -17,6 +18,7 @@ function handleError(err, req: Request, res: Response, next: Function) {
 const app:express = express();
 app.use(morgan('tiny'));
 app.use(bodyParser.json());
+app.use(cors({ origin: '*' }));
 
 // register express routes from defined application routes
 Routes.forEach(route => {
@@ -26,7 +28,7 @@ Routes.forEach(route => {
         route.allowed_roles.length > 0 ? roleAuthentication : [], // role verification
         async (req: Request, res: Response, next: Function) => {
         try {
-
+            
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return res.status(400).json({ errors: errors.array() });
