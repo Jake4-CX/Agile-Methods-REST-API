@@ -16,9 +16,9 @@ function handleError(err, req: Request, res: Response, next: Function) {
 
 // create express app
 const app:express = express();
-app.use(morgan('tiny'));
+app.use(morgan('tiny')); // Console logs
 app.use(bodyParser.json());
-app.use(cors({ origin: '*' }));
+app.use(cors({ origin: '*' })); // Cross origin resource sharing = *   
 
 // register express routes from defined application routes
 Routes.forEach(route => {
