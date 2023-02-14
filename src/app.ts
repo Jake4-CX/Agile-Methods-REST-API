@@ -9,7 +9,7 @@ import { roleAuthentication } from "./middleware/roleAuthentication";
 const cors = require('cors');
 
 
-function handleError(err, req: Request, res: Response, next: Function) {
+function handleError(err, _req: Request, res: Response, _next: Function) {
     res.status(err.statusCode || 500).send({message: err.message});
 }
 
@@ -23,10 +23,11 @@ app.use(cors({ origin: '*' })); // Cross origin resource sharing = *
 // register express routes from defined application routes
 Routes.forEach(route => {
     (app as any)[route.method](route.route,
-        ...route.validation,
+        ...route.validation, // provided requirements (email, password etc)
         route.authorization == true ? jwtAuthentication : [], // jwt verification
         route.allowed_roles.length > 0 ? roleAuthentication : [], // role verification
         async (req: Request, res: Response, next: Function) => {
+
         try {
             
             const errors = validationResult(req);
@@ -39,6 +40,7 @@ Routes.forEach(route => {
         } catch(error) {
             next(error);
         }
+
     })
 })
 

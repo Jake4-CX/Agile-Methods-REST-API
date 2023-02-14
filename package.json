@@ -4,6 +4,7 @@
    "description": "Awesome project developed with TypeORM.",
    "type": "commonjs",
    "devDependencies": {
+      "@types/http-errors": "^2.0.1",
       "@types/jest": "^29.2.6",
       "@types/node": "^16.11.10",
       "dotenv": "^16.0.3",
@@ -20,6 +21,7 @@
       "cors": "^2.8.5",
       "express": "^4.17.2",
       "express-validator": "^6.14.3",
+      "http-errors": "^2.0.0",
       "jsonwebtoken": "^9.0.0",
       "morgan": "^1.10.0",
       "mysql": "^2.18.1",

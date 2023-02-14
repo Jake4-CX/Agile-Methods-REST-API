@@ -4,6 +4,7 @@ import { Users } from "../entity/Users"
 import * as jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 const bcrypt = require('bcrypt');
+var createError = require('http-errors');
 
 export class UserController {
 
@@ -34,7 +35,7 @@ export class UserController {
         })
 
         if (!user) {
-            throw Error("user does not exist");
+            return next(createError(401, "user does not exist"));
         }
         return user
     }
@@ -43,7 +44,7 @@ export class UserController {
         const id = parseInt(request.params.id)
         
         let userToRemove = await this.userRepository.findOneBy({ id })
-        if (!userToRemove) throw Error("user does not exist");
+        if (!userToRemove) return next(createError(401, "user does not exist"));
 
         await this.userRepository.remove(userToRemove)
     }
@@ -55,11 +56,11 @@ export class UserController {
             where: { user_email }
         });
 
-        if (!user) throw Error("user does not exist");
+        if (!user) return next(createError(401, "user does not exist"));
 
         const passwordMatch = await bcrypt.compare(user_password, user.user_password);
 
-        if (!passwordMatch) throw Error("password is incorrect");
+        if (!passwordMatch) return next(createError(401, "password is incorrect"));
 
         delete user.user_password;
 
@@ -77,7 +78,8 @@ export class UserController {
         console.log("user_password: " + user_password);
 
         if (await this.userRepository.findOne({ where: { user_email } }) !== null) {
-            throw Error("a user with this email already exists");
+            return next(createError(401, "a user with this email already exists"));
+            
         }
 
         const user_uuid = uuidv4();

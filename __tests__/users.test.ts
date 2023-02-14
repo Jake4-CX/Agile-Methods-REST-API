@@ -6,9 +6,8 @@ import { AccountRolesController } from "../src/controller/AccountRoleController"
 import { doesNotMatch } from "assert";
 
 const testUser = {
-  firstName: "John",
-  lastName: "Doe",
-  age: 25
+  user_email: "test@email.com",
+  user_password: "password"
 };
 
 let connection, server;
@@ -38,32 +37,23 @@ it('should create a user', async() => {
   const response = await request(app).post('/users').send(testUser);
   console.log(response.body);
   expect(response.statusCode).toBe(200);
-  expect(response.body).toEqual({...testUser, id: 1});
+  delete response.body.user_uuid;
+  delete response.body.token;
+  delete response.body.registration_date;
+  delete response.body.last_login_date;
+  delete response.body.id;
+  expect(response.body).toEqual(testUser);
 });
 
-it('should not create a user if no firstName is given', async() => {
-  const response = await request(app).post('/users').send({...testUser, firstName: undefined});
+it('should not create a user if no email is given', async() => {
+  const response = await request(app).post('/users').send({...testUser, user_email: undefined});
   console.log(response.body);
   expect(response.statusCode).toBe(400);
   expect(response.body.errors).not.toBeNull();
   expect(response.body.errors.length).toBe(1);
   expect(response.body.errors[0]).toEqual({
     "location": "body",
-    "msg": "firstName must be a string",
-    "param": "firstName"
-  });
-});
-
-it('should not create a user if age is less than 0', async() => {
-  const response = await request(app).post('/users').send({...testUser, age: -1});
-  console.log(response.body);
-  expect(response.statusCode).toBe(400);
-  expect(response.body.errors).not.toBeNull();
-  expect(response.body.errors.length).toBe(1);
-  expect(response.body.errors[0]).toEqual({
-    "location": "body",
-    "msg": "age must be a positive integer",
-    "param": "age",
-    "value": -1
+    "msg": "user_email must be a valid email",
+    "param": "user_email"
   });
 });
