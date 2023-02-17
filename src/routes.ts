@@ -48,9 +48,9 @@ export const Routes = [{
     authorization: false,
     allowed_roles: [],
     validation: [
-        body('user_email').isEmail().withMessage("user_email must be a valid email"),
-        body('user_password').isString().withMessage("user_password must be a string"),
-        body('first_name').isString().withMessage("first_name must be a string"),
-        body('last_name').isString().withMessage("last_name must be a string")
+        body('user_email').isEmail().withMessage("user_email must be a valid email").notEmpty().withMessage("user_email must not be empty"),
+        body('user_password').isString().withMessage("user_password must be a string").notEmpty().withMessage("user_password must not be empty"),
+        body('first_name').isString().withMessage("first_name must be a string").notEmpty().withMessage("first_name must not be empty"),
+        body('last_name').isString().withMessage("last_name must be a string").notEmpty().withMessage("last_name must not be empty"),
     ]
 }]
