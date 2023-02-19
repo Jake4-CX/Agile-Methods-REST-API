@@ -26,7 +26,7 @@ afterEach(() => {
   connection.close();
 });
 
-// able to change/del all 'it' codes('should be no users initially', async() => {
+it('should be no users initially', async() => {
   const response = await request(app).get('/users');
   console.log(response.body);
   expect(response.statusCode).toBe(200);
