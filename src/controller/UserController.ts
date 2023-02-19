@@ -56,11 +56,11 @@ export class UserController {
             where: { user_email }
         });
 
-        if (!user) return next(createError(401, "user does not exist"));
+        if (!user) return next(createError(401, "Invalid Email or Password!")); // A user does not exist with this email address
 
         const passwordMatch = await bcrypt.compare(user_password, user.user_password);
 
-        if (!passwordMatch) return next(createError(401, "password is incorrect"));
+        if (!passwordMatch) return next(createError(401, "Invalid Email or Password!")); // Password is incorrect
 
         delete user.user_password;
 
@@ -78,7 +78,7 @@ export class UserController {
         console.log("user_password: " + user_password);
 
         if (await this.userRepository.findOne({ where: { user_email } }) !== null) {
-            return next(createError(401, "a user with this email already exists"));
+            return next(createError(401, "An account already exists with this email address"));
             
         }
 
