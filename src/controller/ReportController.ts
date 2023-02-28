@@ -41,7 +41,7 @@ export class ReportController {
     let { user_id } = request.params;
 
     const userRepository = AppDataSource.getRepository(Users)
-    const user = await userRepository.findOne({ where: { id: user_id } })
+    const user = await userRepository.findOne({ where: { id: parseInt(user_id) } })
 
     if (!user) return next(createError(401, "A user couldn't be found that has the given user_id")); // A user does not exist with this UUID
 
