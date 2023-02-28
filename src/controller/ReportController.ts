@@ -5,6 +5,7 @@ var createError = require('http-errors');
 import { v4 as uuidv4 } from 'uuid';
 import { ImageGroupController } from "./ImageGroupController";
 import { ImageGroups } from "../entity/ImageGroups";
+import { Users } from "../entity/Users";
 
 export class ReportController {
 
@@ -14,7 +15,8 @@ export class ReportController {
     const reports: Reports[] = await this.reportRepository.find({
       order: {
         report_date: "DESC"
-      }
+      },
+      relations: ["report_type", "image_group"]
     });
 
     return reports;
@@ -24,7 +26,8 @@ export class ReportController {
     let { report_uuid } = request.params;
 
     const report: Reports = await this.reportRepository.findOne({
-      where: { report_uuid }
+      where: { report_uuid },
+      relations: ["report_type", "image_group"]
     })
 
     if (!report) return next(createError(401, "A report couldn't be found that has the given report_uuid")); // A report does not exist with this UUID
@@ -37,7 +40,15 @@ export class ReportController {
   async get_reports_from_user_id(request: Request, response: Response, next: NextFunction) {
     let { user_id } = request.params;
 
-    const reports: Reports[] = await this.reportRepository.query(`SELECT * FROM reports WHERE user_id = ${user_id}`);
+    const userRepository = AppDataSource.getRepository(Users)
+    const user = await userRepository.findOne({ where: { id: user_id } })
+
+    if (!user) return next(createError(401, "A user couldn't be found that has the given user_id")); // A user does not exist with this UUID
+
+    const reports: Reports[] = await this.reportRepository.find({
+      where: { user: user.id },
+      relations: ["report_type", "image_group"]
+    })
 
     if (reports.length == 0) return next(createError(401, "A report couldn't be found that has the given user_id")); // A report does not exist with this UUID
 
