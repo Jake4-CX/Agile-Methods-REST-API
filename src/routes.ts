@@ -1,4 +1,5 @@
 import { param, body } from "express-validator";
+import { ReportController } from "./controller/ReportController";
 import { UserController } from "./controller/UserController"
 
 export const Routes = [{
@@ -52,5 +53,47 @@ export const Routes = [{
         body('user_password').isString().withMessage("user_password must be a string").notEmpty().withMessage("user_password must not be empty"),
         body('first_name').isString().withMessage("first_name must be a string").notEmpty().withMessage("first_name must not be empty"),
         body('last_name').isString().withMessage("last_name must be a string").notEmpty().withMessage("last_name must not be empty"),
+    ]
+}, {
+    method: "get",
+    route: "/reports/all",
+    controller: ReportController,
+    action: "get_all_reports",
+    authorization: true,
+    allowed_roles: [],
+    validation: []
+}, {
+    method: "get",
+    route: "/reports/user/:user_id",
+    controller: ReportController,
+    action: "get_reports_from_user_id",
+    authorization: true,
+    allowed_roles: [],
+    validation: [
+        param('user_id').isInt({min: 0}).withMessage("user_id must be a positive integer")
+    ]
+}, {
+    method: "get",
+    route: "/reports/uuid/:report_uuid",
+    controller: ReportController,
+    action: "get_report_from_uuid",
+    authorization: true,
+    allowed_roles: [],
+    validation: [
+        param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID")
+    ]
+}, {
+    method: "post",
+    route: "/reports/report",
+    controller: ReportController,
+    action: "create_report",
+    authorization: true,
+    allowed_roles: [],
+    validation: [
+        body('report_type_id').isInt({min: 0}).withMessage("report_type_id must be a valid integer"),
+        body('report_description').isString().withMessage("report_description must be a string").notEmpty().withMessage("report_description must not be empty"),
+        body('report_latitude').isFloat().withMessage("report_latitude must be a float").notEmpty().withMessage("report_latitude must not be empty"),
+        body('report_longitude').isFloat().withMessage("report_longitude must be a float").notEmpty().withMessage("report_longitude must not be empty"),
+        body('report_serverity').isInt({min: 1, max: 10}).withMessage("report_serverity must be a valid integer"),
     ]
 }]
