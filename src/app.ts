@@ -25,7 +25,7 @@ Routes.forEach(route => {
     (app as any)[route.method](route.route,
         ...route.validation, // provided requirements (email, password etc)
         route.authorization == true ? jwtAuthentication : [], // jwt verification
-        route.allowed_roles.length > 0 ? roleAuthentication : [], // role verification
+        route.allowed_roles.length > 0 ? roleAuthentication(route.allowed_roles) : [], // role verification
         async (req: Request, res: Response, next: Function) => {
 
         try {
