@@ -53,7 +53,7 @@ export class ReportController {
     // Create image group for the user, and get the image group id
     const image_group_id = await ImageGroupController.imageGroupRepository.save(
       Object.assign(new ImageGroups(), {
-        user: request.userId
+        user: request.user_data.id
       })
     )
 
@@ -68,7 +68,7 @@ export class ReportController {
       report_serverity: report_serverity,
       report_status: false,
       image_group: image_group_id,
-      user: request.userId
+      user: request.user_data.id
     })
 
     await this.reportRepository.save(report)

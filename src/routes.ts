@@ -1,5 +1,6 @@
 import { param, body } from "express-validator";
 import { ReportController } from "./controller/ReportController";
+import { ReportTypeController } from "./controller/ReportTypeController";
 import { UserController } from "./controller/UserController"
 
 export const Routes = [{
@@ -95,5 +96,38 @@ export const Routes = [{
         body('report_latitude').isFloat().withMessage("report_latitude must be a float").notEmpty().withMessage("report_latitude must not be empty"),
         body('report_longitude').isFloat().withMessage("report_longitude must be a float").notEmpty().withMessage("report_longitude must not be empty"),
         body('report_serverity').isInt({min: 1, max: 10}).withMessage("report_serverity must be a valid integer"),
+    ]
+}, { // startOf: ReportTypes
+    method: "post",
+    route: "/reports/options/types",
+    controller: ReportTypeController,
+    action: "add_report_type",
+    authorization: true,
+    allowed_roles: ["Administrator"],
+    validation: [
+        body('report_type_name').isString().withMessage("report_type_name must be a string").notEmpty().withMessage("report_type_name must not be empty"),
+        body('report_type_description').isString().withMessage("report_type_description must be a string").notEmpty().withMessage("report_type_description must not be empty"),
+    ]
+}, {
+    method: "patch",
+    route: "/reports/options/types/:report_type_id",
+    controller: ReportTypeController,
+    action: "update_report_type",
+    authorization: true,
+    allowed_roles: ["Administrator"],
+    validation: [
+        param('report_type_id').isInt({min: 0}).withMessage("report_type_id must be a positive integer"),
+        body('report_type_name').isString().withMessage("report_type_name must be a string").notEmpty().withMessage("report_type_name must not be empty"),
+        body('report_type_description').isString().withMessage("report_type_description must be a string").notEmpty().withMessage("report_type_description must not be empty"),
+    ]
+}, {
+    method: "delete",
+    route: "/reports/options/types/:report_type_id",
+    controller: ReportTypeController,
+    action: "delete_report_type",
+    authorization: true,
+    allowed_roles: ["Administrator"],
+    validation: [
+        param('report_type_id').isInt({min: 0}).withMessage("report_type_id must be a positive integer"),
     ]
 }]
