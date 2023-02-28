@@ -7,6 +7,14 @@ export class ReportTypeController {
 
   private reportTypeRepository = AppDataSource.getRepository(ReportTypes)
 
+  async get_all_report_types(request: Request, response: Response, next: NextFunction) {
+    const report_types: ReportTypes[] = await this.reportTypeRepository.find();
+
+    return {
+      types: report_types
+    };
+  }
+
   async add_report_type(request: Request, response: Response, next: NextFunction) {
     let { report_type_name, report_type_description } = request.body;
 

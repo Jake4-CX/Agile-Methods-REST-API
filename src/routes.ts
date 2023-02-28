@@ -130,4 +130,12 @@ export const Routes = [{
     validation: [
         param('report_type_id').isInt({min: 0}).withMessage("report_type_id must be a positive integer"),
     ]
+}, {
+    method: "get",
+    route: "/reports/options",
+    controller: ReportTypeController,
+    action: "get_all_report_types",
+    authorization: true,
+    allowed_roles: [],
+    validation: []
 }]
