@@ -52,7 +52,7 @@ export class UserController {
     async login(request: Request, response: Response, next: NextFunction) {
         const { user_email, user_password } = request.body;
 
-        const user = await this.userRepository.findOne({
+        const user: Users = await this.userRepository.findOne({
             where: { user_email }
         });
 
@@ -93,7 +93,13 @@ export class UserController {
             account_role: 1
         });
 
-        return this.userRepository.save(user)
+        const db_response: Users = await this.userRepository.save(user);
+
+        delete db_response.user_password;
+        delete db_response.last_login_date;
+        delete db_response.registration_date;
+
+        return db_response
     }
 
 }
