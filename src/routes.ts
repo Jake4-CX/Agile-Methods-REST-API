@@ -1,4 +1,5 @@
-import { param, body } from "express-validator";
+import { param, body, check } from "express-validator";
+import { ImageController } from "./controller/ImageController";
 import { ReportController } from "./controller/ReportController";
 import { ReportTypeController } from "./controller/ReportTypeController";
 import { UserController } from "./controller/UserController"
@@ -138,4 +139,34 @@ export const Routes = [{
     authorization: true,
     allowed_roles: [],
     validation: []
+}, { // startOf: images
+    method: "get",
+    route: "/images/:image_group_id",
+    controller: ImageController,
+    action: "get_images_from_group_id",
+    authorization: true,
+    allowed_roles: [],
+    validation: [
+        param('image_group_id').isInt({min: 0}).withMessage("image_group_id must be a positive integer")
+    ]
+}, {
+    method: "post",
+    route: "/images/upload/:image_group_id",
+    controller: ImageController,
+    action: "upload_image",
+    authorization: true,
+    allowed_roles: [],
+    validation: [
+        param('image_group_id').isInt({min: 0}).withMessage("image_group_id must be a positive integer"),
+        // check('image').custom((value, {req}) => {
+        //     if (req.file && req.file.image) {
+        //         console.log(req.file.image.mimetype)
+        //         if (["image/png", "image/jpeg", "image/gif"].includes(req.file.image.mimetype)) {
+        //             return true;
+        //         }
+        //     }
+        //     console.log(req.file)
+        //     return false;
+        // }).withMessage("image must be an approved file type (png, jpeg, gif)")
+    ]
 }]

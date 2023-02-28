@@ -14,7 +14,7 @@ export class UserController {
         // todo, delete password from response
         const users = await this.userRepository.find();
 
-        console.log("UserID from JWT: " + request.userId)
+        console.log("UserID from JWT: " + request.user_data.id)
 
         try {
             users.forEach(user => {
@@ -27,7 +27,7 @@ export class UserController {
 
     async one(request: Request, response: Response, next: NextFunction) {
         const id = parseInt(request.params.id);
-        console.log("UserID from JWT: " + request.userId)
+        console.log("UserID from JWT: " + request.user_data.id)
         
 
         const user = await this.userRepository.findOne({
