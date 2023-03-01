@@ -44,10 +44,19 @@ export class ImageController {
 
     const uploadResult = await new Promise((resolve, reject) => {
       upload(request, response, async function (err: any) {
+
+        if (request.file && request.file) { // File validation has to be done here because the file is not available in the validation middleware
+          if (!(["image/png", "image/jpeg", "image/gif"].includes(request.file.mimetype))) {
+            return reject(next(createError(401, "This file type is not supported (allowed: png, jpeg, gif)")));
+          }
+        } else {
+          return reject(next(createError(401, "No image was uploaded")));
+        }
+
         if (err instanceof multer.MulterError) {
-          reject(next(createError(401, "An error occoured whilst uploading the image")));
+          return reject(next(createError(401, "An error occoured whilst uploading the image")));
         } else if (err) {
-          reject(next(createError(401, "An error occoured whilst uploading the image")));
+          return reject(next(createError(401, "An error occoured whilst uploading the image")));
         }
 
         const file_name = request.file.filename.split('.')
@@ -59,9 +68,9 @@ export class ImageController {
 
         const image_saved: Images = await self.imageRepository.save(image);
 
-        if (!image_saved) reject(next(createError(401, "The image couldn't be uploaded"))); // image couldn't be uploaded
+        if (!image_saved) return reject(next(createError(401, "This image couldn't be uploaded"))); // image couldn't be uploaded
 
-        resolve({ message: "The image has been uploaded successfully", image: image_saved });
+        return resolve({ message: "The image has been uploaded successfully", image: image_saved });
 
       })
     })
