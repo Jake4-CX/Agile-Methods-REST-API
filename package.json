@@ -1,7 +1,7 @@
 {
-   "name": "typeorm-sample",
-   "version": "0.0.1",
-   "description": "Awesome project developed with TypeORM.",
+   "name": "council-report-api",
+   "version": "1.0.0",
+   "description": "REST API for the council report system",
    "type": "commonjs",
    "devDependencies": {
       "@types/http-errors": "^2.0.1",
