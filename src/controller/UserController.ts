@@ -53,7 +53,8 @@ export class UserController {
         const { user_email, user_password } = request.body;
 
         const user: Users = await this.userRepository.findOne({
-            where: { user_email }
+            where: { user_email },
+            relations: ["account_role"]
         });
 
         if (!user) return next(createError(401, "Invalid Email or Password!")); // A user does not exist with this email address
@@ -64,9 +65,10 @@ export class UserController {
 
         delete user.user_password;
 
-        const token = jwt.sign({ id: user.id, email: user.user_email }, process.env.JWT_SECRET, { expiresIn: "30m" });
+        const accessToken = jwt.sign({ id: user.id, email: user.user_email }, process.env.JWT_SECRET, { expiresIn: "30m" });
+        const refreshToken = jwt.sign({ id: user.id, email: user.user_email }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-        return {...user, token}
+        return {...user, tokens: { accessToken, refreshToken }}
 
     }
 
