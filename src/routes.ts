@@ -5,34 +5,6 @@ import { ReportTypeController } from "./controller/ReportTypeController";
 import { UserController } from "./controller/UserController"
 
 export const Routes = [{
-    method: "get",
-    route: "/users",
-    controller: UserController,
-    action: "all",
-    authorization: true,
-    allowed_roles: [],
-    validation: [],
-}, {
-    method: "get",
-    route: "/users/:id",
-    controller: UserController,
-    action: "one",
-    authorization: true,
-    allowed_roles: [],
-    validation: [
-        param('id').isInt({min: 0}).withMessage("id must be a positive integer"),
-    ]
-}, {
-    method: "delete",
-    route: "/users/:id",
-    controller: UserController,
-    action: "remove",
-    authorization: false,
-    allowed_roles: ["admin"],
-    validation: [
-        param('id').isInt({min: 0}).withMessage("id must be a positive integer"),
-    ]
-}, {
     method: "post",
     route: "/users/login",
     controller: UserController,
@@ -56,6 +28,14 @@ export const Routes = [{
         body('first_name').isString().withMessage("first_name must be a string").notEmpty().withMessage("first_name must not be empty"),
         body('last_name').isString().withMessage("last_name must be a string").notEmpty().withMessage("last_name must not be empty"),
     ]
+}, {
+    method: "get",
+    route: "/users/refresh",
+    controller: UserController,
+    action: "refresh_token",
+    authorization: true,
+    allowed_roles: [],
+    validation: []
 }, {
     method: "get",
     route: "/reports/all",
