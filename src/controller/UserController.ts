@@ -1,14 +1,16 @@
 import { AppDataSource } from '../data-source'
 import { NextFunction, Request, Response } from "express"
 import { Users } from "../entity/Users"
-import * as jwt from 'jsonwebtoken';
+import { verify, sign } from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid';
+import { RefreshTokens } from '../entity/RefreshTokens';
 const bcrypt = require('bcrypt');
 var createError = require('http-errors');
 
 export class UserController {
 
     private userRepository = AppDataSource.getRepository(Users)
+    private refreshTokenRepository = AppDataSource.getRepository(RefreshTokens)
 
     async all(request: Request, response: Response, next: NextFunction) {
         // todo, delete password from response
@@ -65,10 +67,11 @@ export class UserController {
 
         delete user.user_password;
 
-        const accessToken = jwt.sign({ id: user.id, email: user.user_email }, process.env.JWT_SECRET, { expiresIn: "30m" });
-        const refreshToken = jwt.sign({ id: user.id, email: user.user_email }, process.env.JWT_SECRET, { expiresIn: "7d" });
+        const tokens = await this.createTokens(user)
 
-        return {...user, tokens: { accessToken, refreshToken }}
+        if (tokens == null) return next(createError(500, "An error occurred while logging in."));
+
+        return {...user, tokens: tokens}
 
     }
 
@@ -104,4 +107,36 @@ export class UserController {
         return db_response
     }
 
+    async refresh_token(request: Request, response: Response, next: NextFunction) {
+        const token = request.token;
+
+        let tokens: { accessToken: string, refreshToken: string };
+
+        if (verify(token, process.env.JWT_REFRESH_SECRET)) {
+            tokens = await this.createTokens(request.user_data as Users)
+            if (tokens == null) return next(createError(500, "An error occurred whilst generating tokens."));
+        } else {
+            return next(createError(401, "This is not a refresh token."));
+        }
+
+        return {tokens: tokens}
+
+    }
+
+
+    async createTokens(user: Users) {
+        const accessToken = sign({ id: user.id, email: user.user_email }, process.env.JWT_ACCESS_SECRET, { expiresIn: "30m" });
+        const refreshToken = sign({ id: user.id, email: user.user_email }, process.env.JWT_REFRESH_SECRET, { expiresIn: "30d" });
+        
+        const response = await this.refreshTokenRepository.save(Object.assign(new RefreshTokens(), {
+            user: user.id,
+            refresh_token: refreshToken,
+            created_at: new Date(),
+            expires_at: new Date(Date.now() + (30 * 24 * 60 * 60 * 1000))
+        }))
+        
+        if (response !== null) return ({accessToken, refreshToken})
+        
+        return null
+    }
 }
