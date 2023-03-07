@@ -22,9 +22,7 @@ export class ImageController {
 
     if (!image_group) return next(createError(401, "An image group couldn't be found that has the given image_group_id")); // An image group does not exist with this id
 
-    const images: Images[] = await this.imageRepository.find({
-      where: { image_group: parseInt(image_group_id) }
-    });
+    const images: Images[] = await this.imageRepository.createQueryBuilder("images").where("images.image_group = :image_group_id", { image_group_id: parseInt(image_group_id) }).getMany()
 
     return images
   }
