@@ -18,10 +18,10 @@ export class Reports {
     @Column()
     report_description: string
 
-    @Column()
+    @Column({type: "decimal", precision: 10, scale: 8})
     report_latitude: number
 
-    @Column()
+    @Column({type: "decimal", precision: 10, scale: 8})
     report_longitude: number
 
     @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
