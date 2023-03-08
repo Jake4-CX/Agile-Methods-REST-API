@@ -42,8 +42,8 @@ export class ImageController {
 
     const uploadResult = await new Promise((resolve, reject) => {
       upload(request, response, async function (err: any) {
-
-        if (request.file && request.file) { // File validation has to be done here because the file is not available in the validation middleware
+        console.log("File debug: ", request.file)
+        if (request.file) { // File validation has to be done here because the file is not available in the validation middleware
           if (!(["image/png", "image/jpeg", "image/gif"].includes(request.file.mimetype))) {
             return reject(next(createError(401, "This file type is not supported (allowed: png, jpeg, gif)")));
           }
