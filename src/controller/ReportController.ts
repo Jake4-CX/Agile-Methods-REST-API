@@ -27,10 +27,14 @@ export class ReportController {
 
     const report: Reports = await this.reportRepository.findOne({
       where: { report_uuid },
-      relations: ["report_type", "image_group"]
+      relations: ["report_type", "image_group", "user"]
     })
 
     if (!report) return next(createError(401, "A report couldn't be found that has the given report_uuid")); // A report does not exist with this UUID
+
+    delete report.user.user_password
+    delete report.user.user_email
+    delete report.user.last_name
 
     return report;
 
@@ -46,7 +50,7 @@ export class ReportController {
     if (!user) return next(createError(401, "A user couldn't be found that has the given user_id")); // A user does not exist with this UUID
 
     const reports: Reports[] = await this.reportRepository.find({
-      where: { user: user.id },
+      where: { user: user },
       relations: ["report_type", "image_group"]
     })
 
@@ -57,7 +61,7 @@ export class ReportController {
   }
 
   async create_report(request: Request, response: Response, next: NextFunction) {
-    let { report_type_id, report_description, report_latitude, report_longitude, report_serverity  } = request.body;
+    let { report_type_id, report_description, report_latitude, report_longitude, report_severity  } = request.body;
 
     const report_uuid = uuidv4();
 
@@ -76,7 +80,7 @@ export class ReportController {
       report_description: report_description,
       report_latitude: report_latitude,
       report_longitude: report_longitude,
-      report_serverity: report_serverity,
+      report_severity: report_severity,
       report_status: false,
       image_group: image_group_id,
       user: request.user_data.id
