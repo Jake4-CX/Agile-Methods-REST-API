@@ -48,6 +48,8 @@ export class ImageController {
             return reject(next(createError(401, "This file type is not supported (allowed: png, jpeg, gif)")));
           }
         } else {
+          console.log("No file was uploaded")
+          console.log("request dump: ", request)
           return reject(next(createError(401, "No image was uploaded")));
         }
 
