@@ -5,7 +5,7 @@ import { Request, Response } from "express";
 import * as morgan from 'morgan';
 import { Routes } from "./routes";
 import { validationResult } from "express-validator/src/validation-result";
-import { jwtAuthentication } from './middleware/JwtAuthentication';
+import { jwtAuthentication } from './middleware/jwtAuthentication';
 import { roleAuthentication } from "./middleware/roleAuthentication";
 const cors = require('cors');
 const path = require('path');
