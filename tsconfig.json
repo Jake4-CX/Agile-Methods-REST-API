@@ -17,6 +17,7 @@
       "./src/types"
    ],
    "include": [
-      "./src/**/*"
+      "./src/**/*",
+      "./package.json",
    ],
 }
