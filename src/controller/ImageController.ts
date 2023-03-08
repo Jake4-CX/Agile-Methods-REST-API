@@ -80,10 +80,10 @@ export class ImageController {
 }
 
 const storage = multer.diskStorage({
-  destination: function (req: Request, file: Express.Multer.File, cb: FileNameCallback) {
+  destination: function (req: Request, file: any, cb: FileNameCallback) {
     cb(null, 'images/')
   },
-  filename: function (req: Request, file: Express.Multer.File, cb: FileNameCallback) {
+  filename: function (req: Request, file: any, cb: FileNameCallback) {
     const uuid = uuidv4();
     const fileExtension = file.originalname.split('.').pop();
     cb(null, uuid + '.' + fileExtension)
