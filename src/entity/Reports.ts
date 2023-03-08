@@ -28,7 +28,7 @@ export class Reports {
     report_date: Date
 
     @Column()
-    report_serverity: number
+    report_severity: number
 
     @Column()
     report_status: boolean
@@ -37,6 +37,6 @@ export class Reports {
     image_group: number
 
     @ManyToOne(type => Users, user => user.id, { nullable: false })
-    user: number
+    user: Users
 
 }

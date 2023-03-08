@@ -76,7 +76,7 @@ export const Routes = [{
         body('report_description').isString().withMessage("report_description must be a string").notEmpty().withMessage("report_description must not be empty"),
         body('report_latitude').isFloat().withMessage("report_latitude must be a float").notEmpty().withMessage("report_latitude must not be empty"),
         body('report_longitude').isFloat().withMessage("report_longitude must be a float").notEmpty().withMessage("report_longitude must not be empty"),
-        body('report_serverity').isInt({min: 1, max: 10}).withMessage("report_serverity must be a valid integer"),
+        body('report_severity').isInt({min: 1, max: 10}).withMessage("report_severity must be a valid integer"),
     ]
 }, { // startOf: ReportTypes
     method: "post",
