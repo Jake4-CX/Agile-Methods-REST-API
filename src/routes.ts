@@ -41,7 +41,7 @@ export const Routes = [{
     route: "/reports/all",
     controller: ReportController,
     action: "get_all_reports",
-    authorization: true,
+    authorization: false,
     allowed_roles: [],
     validation: []
 }, {
@@ -49,7 +49,7 @@ export const Routes = [{
     route: "/reports/user/:user_id",
     controller: ReportController,
     action: "get_reports_from_user_id",
-    authorization: true,
+    authorization: false,
     allowed_roles: [],
     validation: [
         param('user_id').isInt({min: 0}).withMessage("user_id must be a positive integer")
@@ -59,7 +59,7 @@ export const Routes = [{
     route: "/reports/uuid/:report_uuid",
     controller: ReportController,
     action: "get_report_from_uuid",
-    authorization: true,
+    authorization: false,
     allowed_roles: [],
     validation: [
         param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID")
@@ -116,7 +116,7 @@ export const Routes = [{
     route: "/reports/options",
     controller: ReportTypeController,
     action: "get_all_report_types",
-    authorization: true,
+    authorization: false,
     allowed_roles: [],
     validation: []
 }, { // startOf: images
@@ -124,7 +124,7 @@ export const Routes = [{
     route: "/images/:image_group_id",
     controller: ImageController,
     action: "get_images_from_group_id",
-    authorization: true,
+    authorization: false,
     allowed_roles: [],
     validation: [
         param('image_group_id').isInt({min: 0}).withMessage("image_group_id must be a positive integer")
