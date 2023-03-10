@@ -8,3 +8,5 @@ export const database_port:number = parseInt(process.env.DATABASE_PORT) || 3306;
 export const database_name = process.env.DATABASE_NAME || "Reports";
 export const database_user = process.env.DATABASE_USER || "council_user";
 export const database_password = process.env.DATABASE_PASSWORD || "4*CMgmdI6uv@";
+
+export const recaptcha_secret_key = process.env.RECAPTCHA_SECRET_KEY || '';
