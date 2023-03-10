@@ -90,7 +90,7 @@ export class UserController {
         const recaptchaVerifyResponse = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${recaptcha_secret_key}&response=${recaptcha_token}`);
 
         if (!recaptchaVerifyResponse.data.success) {
-            return next(createError(401, "reCAPTCHA verification failed! - " + JSON.stringify(recaptchaVerifyResponse.data)));
+            return next(createError(401, "reCAPTCHA verification failed!"));
         }
 
         user_password = await bcrypt.hash(user_password, 10);
