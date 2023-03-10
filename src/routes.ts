@@ -13,7 +13,8 @@ export const Routes = [{
     allowed_roles: [],
     validation: [
         body('user_email').isEmail().withMessage("user_email must be a valid email"),
-        body('user_password').isString().withMessage("user_password must be a string")
+        body('user_password').isString().withMessage("user_password must be a string"),
+        body('recaptcha_token').isString().withMessage("recaptcha_token must be a string")
     ]
 }, {
     method: "post",
