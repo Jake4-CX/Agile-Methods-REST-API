@@ -28,6 +28,7 @@ export const Routes = [{
         body('user_password').isString().withMessage("user_password must be a string").notEmpty().withMessage("user_password must not be empty"),
         body('first_name').isString().withMessage("first_name must be a string").notEmpty().withMessage("first_name must not be empty"),
         body('last_name').isString().withMessage("last_name must be a string").notEmpty().withMessage("last_name must not be empty"),
+        body('recaptcha_token').isString().withMessage("recaptcha_token must be a string").notEmpty().withMessage("recaptcha_token must not be empty")
     ]
 }, {
     method: "get",
