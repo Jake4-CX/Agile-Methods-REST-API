@@ -4,6 +4,8 @@ import { Users } from "../entity/Users"
 import { verify, sign } from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid';
 import { RefreshTokens } from '../entity/RefreshTokens';
+import { recaptcha_secret_key } from '../config';
+import axios from 'axios';
 const bcrypt = require('bcrypt');
 var createError = require('http-errors');
 
@@ -30,7 +32,7 @@ export class UserController {
     async one(request: Request, response: Response, next: NextFunction) {
         const id = parseInt(request.params.id);
         console.log("UserID from JWT: " + request.user_data.id)
-        
+
 
         const user = await this.userRepository.findOne({
             where: { id }
@@ -44,7 +46,7 @@ export class UserController {
 
     async remove(request: Request, response: Response, next: NextFunction) {
         const id = parseInt(request.params.id)
-        
+
         let userToRemove = await this.userRepository.findOneBy({ id })
         if (!userToRemove) return next(createError(401, "user does not exist"));
 
@@ -52,7 +54,20 @@ export class UserController {
     }
 
     async login(request: Request, response: Response, next: NextFunction) {
-        const { user_email, user_password } = request.body;
+        const { user_email, user_password, recaptcha_token } = request.body;
+
+        // Verify recaptcha_token
+        const recaptchaSecret = recaptcha_secret_key;
+        const recaptchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify`;
+        const recaptchaVerifyData = {
+            secret: recaptchaSecret,
+            response: recaptcha_token,
+        };
+        
+        const recaptchaVerifyResponse = await axios.post(recaptchaVerifyUrl, recaptchaVerifyData);
+        if (!recaptchaVerifyResponse.data.success) {
+            return next(createError(401, "reCAPTCHA verification failed!"));
+        }
 
         const user: Users = await this.userRepository.findOne({
             where: { user_email },
@@ -71,7 +86,7 @@ export class UserController {
 
         if (tokens == null) return next(createError(500, "An error occurred while logging in."));
 
-        return {...user, tokens: tokens}
+        return { ...user, tokens: tokens }
 
     }
 
@@ -84,7 +99,7 @@ export class UserController {
 
         if (await this.userRepository.findOne({ where: { user_email } }) !== null) {
             return next(createError(401, "An account already exists with this email address"));
-            
+
         }
 
         const user_uuid = uuidv4();
@@ -119,7 +134,7 @@ export class UserController {
             return next(createError(401, "This is not a refresh token."));
         }
 
-        return {tokens: tokens}
+        return { tokens: tokens }
 
     }
 
@@ -127,16 +142,16 @@ export class UserController {
     async createTokens(user: Users) {
         const accessToken = sign({ id: user.id, email: user.user_email }, process.env.JWT_ACCESS_SECRET, { expiresIn: "30m" });
         const refreshToken = sign({ id: user.id, email: user.user_email }, process.env.JWT_REFRESH_SECRET, { expiresIn: "30d" });
-        
+
         const response = await this.refreshTokenRepository.save(Object.assign(new RefreshTokens(), {
             user: user.id,
             refresh_token: refreshToken,
             created_at: new Date(),
             expires_at: new Date(Date.now() + (30 * 24 * 60 * 60 * 1000))
         }))
-        
-        if (response !== null) return ({accessToken, refreshToken})
-        
+
+        if (response !== null) return ({ accessToken, refreshToken })
+
         return null
     }
 }
