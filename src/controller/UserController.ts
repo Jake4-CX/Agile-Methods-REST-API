@@ -56,15 +56,9 @@ export class UserController {
     async login(request: Request, response: Response, next: NextFunction) {
         const { user_email, user_password, recaptcha_token } = request.body;
 
-        // Verify recaptcha_token
-        const recaptchaSecret = recaptcha_secret_key;
-        const recaptchaVerifyUrl = `https://www.google.com/recaptcha/api/siteverify`;
-        const recaptchaVerifyData = {
-            secret: recaptchaSecret,
-            response: recaptcha_token,
-        };
-        
-        const recaptchaVerifyResponse = await axios.post(recaptchaVerifyUrl, recaptchaVerifyData);
+        // Verify recaptcha_token - google docs for recaptcha v2 informs users to POST the paramaters, but for some reason this doesn't work   
+        const recaptchaVerifyResponse = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${recaptcha_secret_key}&response=${recaptcha_token}`);
+
         if (!recaptchaVerifyResponse.data.success) {
             return next(createError(401, "reCAPTCHA verification failed!"));
         }
@@ -91,7 +85,13 @@ export class UserController {
     }
 
     async register(request: Request, response: Response, next: NextFunction) {
-        let { user_email, user_password, first_name, last_name } = request.body;
+        let { user_email, user_password, first_name, last_name, recaptcha_token } = request.body;
+
+        const recaptchaVerifyResponse = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${recaptcha_secret_key}&response=${recaptcha_token}`);
+
+        if (!recaptchaVerifyResponse.data.success) {
+            return next(createError(401, "reCAPTCHA verification failed!"));
+        }
 
         user_password = await bcrypt.hash(user_password, 10);
 
