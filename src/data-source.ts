@@ -12,6 +12,7 @@ import { Users } from "./entity/Users"
 import { Verification } from "./entity/Verification"
 import * as config from "./config"
 import { RefreshTokens } from "./entity/RefreshTokens"
+import { ReportVotes } from "./entity/ReportVotes"
 
 export const AppDataSource = new DataSource({
     type: "mariadb",
@@ -22,7 +23,7 @@ export const AppDataSource = new DataSource({
     database: config.database_name, 
     synchronize: true,
     logging: false,
-    entities: [Users, AccountRoles, RefreshTokens, Verification, Reports, ReportTypes, ReportUpdates, AssignedReports, ImageGroups, Images],
+    entities: [Users, AccountRoles, RefreshTokens, Verification, Reports, ReportVotes, ReportTypes, ReportUpdates, AssignedReports, ImageGroups, Images],
     migrations: [],
     subscribers: [],
     namingStrategy: new SnakeNamingStrategy(),

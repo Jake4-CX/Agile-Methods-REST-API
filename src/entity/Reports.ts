@@ -38,5 +38,7 @@ export class Reports {
 
     @ManyToOne(type => Users, user => user.id, { nullable: false })
     user: Users
+    
+  report_votes?: { upvotes: number; downvotes: number }
 
 }
