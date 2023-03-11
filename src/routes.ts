@@ -2,6 +2,7 @@ import { param, body, checkSchema } from "express-validator";
 import { ImageController } from "./controller/ImageController";
 import { ReportController } from "./controller/ReportController";
 import { ReportTypeController } from "./controller/ReportTypeController";
+import { ReportVoteController } from "./controller/ReportVoteController";
 import { UserController } from "./controller/UserController"
 
 export const Routes = [{
@@ -140,5 +141,57 @@ export const Routes = [{
     allowed_roles: [],
     validation: [
         param('image_group_id').isInt({min: 0}).withMessage("image_group_id must be a positive integer")
+    ]
+}, { // startOf: reportVotes
+    method: "post",
+    route: "/reports/uuid/:report_uuid/vote",
+    controller: ReportVoteController,
+    action: "create_report_vote",
+    authorization: true,
+    allowed_roles: [],
+    validation: [
+        param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
+        body('vote_type').isString().withMessage("vote_type must be a string").notEmpty().withMessage("vote_type must not be empty").custom((value) => {
+            if (value !== "upvote" && value !== "downvote") {
+                throw new Error("vote_type must be either 'upvote' or 'downvote'");
+            }
+            return true;
+        })
+    ]
+}, {
+    method: "delete",
+    route: "/reports/uuid/:report_uuid/vote",
+    controller: ReportVoteController,
+    action: "delete_report_vote",
+    authorization: true,
+    allowed_roles: [],
+    validation: [
+        param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
+    ]
+}, {
+    method: "put",
+    route: "/reports/uuid/:report_uuid/vote",
+    controller: ReportVoteController,
+    action: "update_report_vote",
+    authorization: true,
+    allowed_roles: [],
+    validation: [
+        param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
+        body('vote_type').isString().withMessage("vote_type must be a string").notEmpty().withMessage("vote_type must not be empty").custom((value) => {
+            if (value !== "upvote" && value !== "downvote") {
+                throw new Error("vote_type must be either 'upvote' or 'downvote'");
+            }
+            return true;
+        })
+    ]
+}, {
+    method: "get",
+    route: "/reports/uuid/:report_uuid/vote",
+    controller: ReportVoteController,
+    action: "get_report_votes",
+    authorization: true,
+    allowed_roles: [],
+    validation: [
+        param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
     ]
 }]

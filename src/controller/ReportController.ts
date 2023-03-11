@@ -6,18 +6,34 @@ import { v4 as uuidv4 } from 'uuid';
 import { ImageGroupController } from "./ImageGroupController";
 import { ImageGroups } from "../entity/ImageGroups";
 import { Users } from "../entity/Users";
+import { ReportVotes } from "../entity/ReportVotes";
 
 export class ReportController {
 
   private reportRepository = AppDataSource.getRepository(Reports)
+  private reportVoteRepository = AppDataSource.getRepository(ReportVotes)
 
   async get_all_reports(request: Request, response: Response, next: NextFunction) {
     const reports: Reports[] = await this.reportRepository.find({
       order: {
         report_date: "DESC"
       },
-      relations: ["report_type", "image_group"]
+      relations: ["report_type", "image_group", "user"]
     });
+
+    for (let report of reports) {
+      let report_votes = await this.reportVoteRepository.findBy({ report: report.id })
+
+      report.report_votes = {
+        upvotes: report_votes.filter((report_vote) => report_vote.vote_type == 1).length,
+        downvotes: report_votes.filter((report_vote) => report_vote.vote_type == -1).length
+      }
+
+      // Remove the user password and email from the report object
+      delete report.user.user_password
+      delete report.user.user_email
+      delete report.user.last_name
+    }
 
     return reports;
   }
@@ -32,6 +48,14 @@ export class ReportController {
 
     if (!report) return next(createError(401, "A report couldn't be found that has the given report_uuid")); // A report does not exist with this UUID
 
+    let report_votes = await this.reportVoteRepository.findBy({ report: report.id })
+
+    report.report_votes = {
+      upvotes: report_votes.filter((report_vote) => report_vote.vote_type == 1).length,
+      downvotes: report_votes.filter((report_vote) => report_vote.vote_type == -1).length
+    }
+
+    // Remove the user password and email from the report object
     delete report.user.user_password
     delete report.user.user_email
     delete report.user.last_name
@@ -53,6 +77,17 @@ export class ReportController {
       where: { user: user },
       relations: ["report_type", "image_group"]
     })
+
+    // Add report votes to each report object
+
+    for (let report of reports) {
+      let report_votes = await this.reportVoteRepository.findBy({ report: report.id })
+
+      report.report_votes = {
+        upvotes: report_votes.filter((report_vote) => report_vote.vote_type == 1).length,
+        downvotes: report_votes.filter((report_vote) => report_vote.vote_type == -1).length
+      }
+    }
 
     if (reports.length == 0) return next(createError(401, "A report couldn't be found that has the given user_id")); // A report does not exist with this UUID
 
