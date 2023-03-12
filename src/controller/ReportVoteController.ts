@@ -79,9 +79,15 @@ export class ReportVoteController {
     let report = await this.reportRepository.findOneBy({ report_uuid: report_uuid })
     if (!report) return next(createError(401, "Report does not exist"));
 
-    let report_votes = await this.reportVoteRepository.find({ where: {report: {id: report.id}}, take: 15 })
+    let report_votes = await this.reportVoteRepository.createQueryBuilder('report_votes')
+      .where({report: {id: report.id}})
+      .take(15)
+      .select(["report_votes.id", "report_votes.vote_date", "report_votes.vote_type", "user.id", "user.first_name"])
+      .leftJoin("report_votes.user", "user")
+      .getMany()
+    
 
-    const has_user_voted: boolean = report_votes.filter(report_vote => report_vote.user_id === user_id).length > 0
+    const has_user_voted: boolean = report_votes.filter(report_vote => (report_vote.user as Users).id === user_id).length > 0
 
     return report_votes ? { votes: report_votes, user_voted: has_user_voted } : next(createError(401, "Failed to get report votes"));
   }
