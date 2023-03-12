@@ -18,7 +18,7 @@ export class ReportVoteController {
     let report = await this.reportRepository.findOneBy({ report_uuid: report_uuid })
     if (!report) return next(createError(401, "Report does not exist"));
 
-    const report_vote_check = await this.reportVoteRepository.findOneBy({ report_id: report.id, user: user_id })
+    const report_vote_check = await this.reportVoteRepository.findOneBy({ report: report, user: user_id })
 
     if (report_vote_check) return next(createError(401, "The user has already voted on this report"));
 
