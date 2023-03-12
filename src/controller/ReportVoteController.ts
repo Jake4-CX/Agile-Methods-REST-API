@@ -25,7 +25,7 @@ export class ReportVoteController {
       Object.assign(new ReportVotes(), {
         report: report.id,
         user: user_id,
-        vote_type: vote_type
+        vote_type: (vote_type === "upvote" ? 1 : -1)
       } as ReportVotes)
     )
 
@@ -64,7 +64,7 @@ export class ReportVoteController {
 
     if (!report_vote) return next(createError(401, "report vote does not exist"));
 
-    const update_vote = await this.reportVoteRepository.update(report_vote, { vote_type: vote_type })
+    const update_vote = await this.reportVoteRepository.update(report_vote, { vote_type: (vote_type === "upvote" ? 1 : -1) })
 
     return update_vote ? {message: "This vote has been updated successfully"} : next(createError(401, "Failed to update report vote"));
   }
@@ -72,12 +72,16 @@ export class ReportVoteController {
   async get_report_votes(request: Request, response: Response, next: NextFunction) {
     const report_uuid = request.params.report_uuid
 
+    const user_id: number = request.user_data.id
+
     // get report from report_uuid
     let report = await this.reportRepository.findOneBy({ report_uuid: report_uuid })
     if (!report) return next(createError(401, "Report does not exist"));
 
     let report_votes = await this.reportVoteRepository.findBy({ report: report.id })
 
-    return report_votes ? { votes: report_votes } : next(createError(401, "Failed to get report votes"));
+    const has_user_voted: boolean = report_votes.filter(report_vote => report_vote.user === user_id).length > 0
+
+    return report_votes ? { votes: report_votes, user_voted: has_user_voted } : next(createError(401, "Failed to get report votes"));
   }
 }
