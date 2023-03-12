@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
 import { ImageGroups } from "./ImageGroups"
+import { Images } from "./Images"
 import { ReportTypes } from "./ReportTypes"
 import { Users } from "./Users"
 
@@ -40,5 +41,6 @@ export class Reports {
     user: Users
     
   report_votes?: { upvotes: number; downvotes: number }
+  report_images?: Images[]
 
 }

@@ -7,11 +7,13 @@ import { ImageGroupController } from "./ImageGroupController";
 import { ImageGroups } from "../entity/ImageGroups";
 import { Users } from "../entity/Users";
 import { ReportVotes } from "../entity/ReportVotes";
+import { Images } from "../entity/Images";
 
 export class ReportController {
 
   private reportRepository = AppDataSource.getRepository(Reports)
   private reportVoteRepository = AppDataSource.getRepository(ReportVotes)
+  private imageRepository = AppDataSource.getRepository(Images)
 
   async get_all_reports(request: Request, response: Response, next: NextFunction) {
     const reports: Reports[] = await this.reportRepository.find({
@@ -28,6 +30,8 @@ export class ReportController {
         upvotes: report_votes.filter((report_vote) => report_vote.vote_type == 1).length,
         downvotes: report_votes.filter((report_vote) => report_vote.vote_type == -1).length
       }
+
+      report.report_images = await this.imageRepository.findBy({ image_group: report.image_group })
 
       // Remove the user password and email from the report object
       delete report.user.user_password
@@ -54,6 +58,8 @@ export class ReportController {
       upvotes: report_votes.filter((report_vote) => report_vote.vote_type == 1).length,
       downvotes: report_votes.filter((report_vote) => report_vote.vote_type == -1).length
     }
+
+    report.report_images = await this.imageRepository.findBy({ image_group: report.image_group })
 
     // Remove the user password and email from the report object
     delete report.user.user_password
@@ -87,6 +93,8 @@ export class ReportController {
         upvotes: report_votes.filter((report_vote) => report_vote.vote_type == 1).length,
         downvotes: report_votes.filter((report_vote) => report_vote.vote_type == -1).length
       }
+
+      report.report_images = await this.imageRepository.findBy({ image_group: report.image_group })
     }
 
     if (reports.length == 0) return next(createError(401, "A report couldn't be found that has the given user_id")); // A report does not exist with this UUID
