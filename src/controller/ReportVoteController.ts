@@ -25,6 +25,7 @@ export class ReportVoteController {
     const report_vote = await this.reportVoteRepository.save(
       Object.assign(new ReportVotes(), {
         report: report.id,
+        report_id: report.id,
         user: user_id,
         vote_type: (vote_type === "upvote" ? 1 : -1)
       } as ReportVotes)
