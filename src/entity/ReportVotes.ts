@@ -11,13 +11,13 @@ export class ReportVotes {
   @ManyToOne(type => Reports, report => report.id, { nullable: false })
   report: Reports | number
 
-  @Column()
+  @Column({default: null})
   report_id?: number
 
   @ManyToOne(type => Users, user => user.id, { nullable: false })
   user: Users | number
 
-  @Column()
+  @Column({default: null})
   user_id: number
 
   @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
