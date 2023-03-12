@@ -12,7 +12,7 @@ export class ReportVotes {
   report: Reports | number
 
   @Column()
-  report_id: number
+  report_id?: number
 
   @ManyToOne(type => Users, user => user.id, { nullable: false })
   user: Users | number
