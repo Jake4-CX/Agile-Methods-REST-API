@@ -3,6 +3,7 @@ var createError = require('http-errors');
 import { AppDataSource } from "../data-source";
 import { Reports } from "../entity/Reports";
 import { ReportVotes } from "../entity/ReportVotes";
+import { Users } from "../entity/Users";
 
 export class ReportVoteController {
 
@@ -78,9 +79,9 @@ export class ReportVoteController {
     let report = await this.reportRepository.findOneBy({ report_uuid: report_uuid })
     if (!report) return next(createError(401, "Report does not exist"));
 
-    let report_votes = await this.reportVoteRepository.findBy({ report: report.id })
+    let report_votes = await this.reportVoteRepository.find({ where: { report: report.id }, take: 15 })
 
-    const has_user_voted: boolean = report_votes.filter(report_vote => report_vote.user === user_id).length > 0
+    const has_user_voted: boolean = report_votes.filter(report_vote => report_vote.user_id === user_id).length > 0
 
     return report_votes ? { votes: report_votes, user_voted: has_user_voted } : next(createError(401, "Failed to get report votes"));
   }

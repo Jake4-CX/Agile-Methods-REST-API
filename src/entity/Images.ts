@@ -8,7 +8,7 @@ export class Images {
   id: number
 
   @ManyToOne(type => ImageGroups, imageGroups => imageGroups.id, { nullable: false })
-  image_group: number
+  image_group: ImageGroups | number
 
   @Column()
   image_uuid: string
