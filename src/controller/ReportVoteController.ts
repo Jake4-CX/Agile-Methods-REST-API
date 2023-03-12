@@ -18,14 +18,13 @@ export class ReportVoteController {
     let report = await this.reportRepository.findOneBy({ report_uuid: report_uuid })
     if (!report) return next(createError(401, "Report does not exist"));
 
-    const report_vote_check = await this.reportVoteRepository.findOneBy({ report: report, user: user_id })
+    const report_vote_check = await this.reportVoteRepository.findOneBy({ report: {id: report.id }, user: user_id })
 
     if (report_vote_check) return next(createError(401, "The user has already voted on this report"));
 
     const report_vote = await this.reportVoteRepository.save(
       Object.assign(new ReportVotes(), {
         report: report.id,
-        report_id: report.id,
         user: user_id,
         vote_type: (vote_type === "upvote" ? 1 : -1)
       } as ReportVotes)
@@ -44,7 +43,7 @@ export class ReportVoteController {
     let report = await this.reportRepository.findOneBy({ report_uuid: report_uuid })
     if (!report) return next(createError(401, "Report does not exist"));
 
-    let report_vote = await this.reportVoteRepository.findOneBy({ report_id: report.id, user: user_id })
+    let report_vote = await this.reportVoteRepository.findOneBy({ report: {id: report.id }, user: user_id })
 
     if (!report_vote) return next(createError(401, "report vote does not exist"));
 
@@ -62,7 +61,7 @@ export class ReportVoteController {
     let report = await this.reportRepository.findOneBy({ report_uuid: report_uuid })
     if (!report) return next(createError(401, "Report does not exist"));
 
-    let report_vote = await this.reportVoteRepository.findOneBy({ report_id: report.id, user: user_id })
+    let report_vote = await this.reportVoteRepository.findOneBy({ report: {id: report.id }, user: user_id })
 
     if (!report_vote) return next(createError(401, "report vote does not exist"));
 
@@ -80,7 +79,7 @@ export class ReportVoteController {
     let report = await this.reportRepository.findOneBy({ report_uuid: report_uuid })
     if (!report) return next(createError(401, "Report does not exist"));
 
-    let report_votes = await this.reportVoteRepository.find({ where: { report_id: report.id }, take: 15 })
+    let report_votes = await this.reportVoteRepository.find({ where: {report: {id: report.id}}, take: 15 })
 
     const has_user_voted: boolean = report_votes.filter(report_vote => report_vote.user_id === user_id).length > 0
 
