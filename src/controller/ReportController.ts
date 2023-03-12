@@ -24,7 +24,7 @@ export class ReportController {
     });
 
     for (let report of reports) {
-      let report_votes = await this.reportVoteRepository.findBy({ report_id: report.id })
+      let report_votes = await this.reportVoteRepository.findBy({ report: {id: report.id } })
 
       report.report_votes = {
         upvotes: report_votes.filter((report_vote) => report_vote.vote_type == 1).length,
@@ -52,7 +52,7 @@ export class ReportController {
 
     if (!report) return next(createError(401, "A report couldn't be found that has the given report_uuid")); // A report does not exist with this UUID
 
-    let report_votes = await this.reportVoteRepository.findBy({ report_id: report.id })
+    let report_votes = await this.reportVoteRepository.findBy({ report: {id: report.id } })
 
     report.report_votes = {
       upvotes: report_votes.filter((report_vote) => report_vote.vote_type == 1).length,
@@ -87,7 +87,7 @@ export class ReportController {
     // Add report votes to each report object
 
     for (let report of reports) {
-      let report_votes = await this.reportVoteRepository.findBy({ report_id: report.id })
+      let report_votes = await this.reportVoteRepository.findBy({ report: {id: report.id } })
 
       report.report_votes = {
         upvotes: report_votes.filter((report_vote) => report_vote.vote_type == 1).length,
