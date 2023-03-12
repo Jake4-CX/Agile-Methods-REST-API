@@ -189,7 +189,7 @@ export const Routes = [{
     route: "/reports/uuid/:report_uuid/vote",
     controller: ReportVoteController,
     action: "get_report_votes",
-    authorization: true,
+    authorization: false,
     allowed_roles: [],
     validation: [
         param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
