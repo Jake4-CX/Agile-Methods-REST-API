@@ -16,7 +16,7 @@ export class ReportTypeController {
   }
 
   async add_report_type(request: Request, response: Response, next: NextFunction) {
-    let { report_type_name, report_type_description } = request.body;
+    let { report_type_name, report_type_description, report_type_icon } = request.body;
 
     const report_type_check = await this.reportTypeRepository.findOne({
       where: { report_type_name }
@@ -27,7 +27,8 @@ export class ReportTypeController {
     const report_type = await this.reportTypeRepository.save(
       Object.assign(new ReportTypes(), {
         report_type_name,
-        report_type_description
+        report_type_description,
+        report_type_icon
       })
     )
 
@@ -48,11 +49,12 @@ export class ReportTypeController {
 
   async update_report_type(request: Request, response: Response, next: NextFunction) {
     let { report_type_id } = request.params;
-    let { report_type_name, report_type_description } = request.body;
+    let { report_type_name, report_type_description, report_type_icon } = request.body;
 
     const report_type = await this.reportTypeRepository.update(report_type_id, {
       report_type_name,
-      report_type_description
+      report_type_description,
+      report_type_icon
     });
 
     if (!report_type) return next(createError(401, "This report type couldn't be updated")); // report type couldn't be updated
