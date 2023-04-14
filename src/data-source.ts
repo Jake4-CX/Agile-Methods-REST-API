@@ -10,17 +10,20 @@ import { ReportTypes } from "./entity/ReportTypes"
 import { ReportUpdates } from "./entity/ReportUpdates"
 import { Users } from "./entity/Users"
 import { Verification } from "./entity/Verification"
+import * as config from "./config"
+import { RefreshTokens } from "./entity/RefreshTokens"
+import { ReportVotes } from "./entity/ReportVotes"
 
 export const AppDataSource = new DataSource({
     type: "mariadb",
-    host: "localhost",
-    port: 3306,
-    username: "council_user",
-    password: "4*CMgmdI6uv@",
-    database: "Reports",
+    host: config.database_address,
+    port: config.database_port,
+    username: config.database_user,
+    password: config.database_password,
+    database: config.database_name, 
     synchronize: true,
     logging: false,
-    entities: [Users, AccountRoles, Verification, Reports, ReportTypes, ReportUpdates, AssignedReports, ImageGroups, Images],
+    entities: [Users, AccountRoles, RefreshTokens, Verification, Reports, ReportVotes, ReportTypes, ReportUpdates, AssignedReports, ImageGroups, Images],
     migrations: [],
     subscribers: [],
     namingStrategy: new SnakeNamingStrategy(),

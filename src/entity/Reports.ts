@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
 import { ImageGroups } from "./ImageGroups"
+import { Images } from "./Images"
 import { ReportTypes } from "./ReportTypes"
 import { Users } from "./Users"
 
@@ -18,17 +19,17 @@ export class Reports {
     @Column()
     report_description: string
 
-    @Column()
+    @Column({type: "decimal", precision: 10, scale: 8})
     report_latitude: number
 
-    @Column()
+    @Column({type: "decimal", precision: 10, scale: 8})
     report_longitude: number
 
     @Column({type: "timestamp", default: () => "CURRENT_TIMESTAMP", nullable: false})
     report_date: Date
 
     @Column()
-    report_serverity: number
+    report_severity: number
 
     @Column()
     report_status: boolean
@@ -37,6 +38,9 @@ export class Reports {
     image_group: number
 
     @ManyToOne(type => Users, user => user.id, { nullable: false })
-    user: number
+    user: Users
+    
+  report_votes?: { upvotes: number; downvotes: number }
+  report_images?: Images[]
 
 }

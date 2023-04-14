@@ -29,6 +29,6 @@ export class Users {
     last_login_date: Date
 
     @ManyToOne(type => AccountRoles, account_role => account_role.id, { nullable: false })
-    account_role: AccountRoles
+    account_role: number
 
 }

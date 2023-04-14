@@ -1,8 +1,8 @@
 {
    "compilerOptions": {
       "lib": [
-         "es5",
-         "es6"
+         "es6",
+         "es5"
       ],
       "target": "es5",
       "module": "commonjs",
@@ -11,5 +11,13 @@
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
       "sourceMap": true
-   }
+   },
+   "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+   ],
+   "include": [
+      "./src/**/*",
+      "./package.json",
+   ],
 }

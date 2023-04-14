@@ -9,7 +9,4 @@ export class AccountRoles {
     @Column()
     role_name: string
 
-    @Column()
-    role_weight: number
-
 }
