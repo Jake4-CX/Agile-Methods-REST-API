@@ -91,6 +91,7 @@ export const Routes = [{
     validation: [
         body('report_type_name').isString().withMessage("report_type_name must be a string").notEmpty().withMessage("report_type_name must not be empty"),
         body('report_type_description').isString().withMessage("report_type_description must be a string").notEmpty().withMessage("report_type_description must not be empty"),
+        body('report_type_icon').isString().withMessage("report_type_icon must be a string").notEmpty().withMessage("report_type_icon must not be empty"),
     ]
 }, {
     method: "patch",
@@ -103,6 +104,7 @@ export const Routes = [{
         param('report_type_id').isInt({min: 0}).withMessage("report_type_id must be a positive integer"),
         body('report_type_name').isString().withMessage("report_type_name must be a string").notEmpty().withMessage("report_type_name must not be empty"),
         body('report_type_description').isString().withMessage("report_type_description must be a string").notEmpty().withMessage("report_type_description must not be empty"),
+        body('report_type_icon').isString().withMessage("report_type_icon must be a string").notEmpty().withMessage("report_type_icon must not be empty"),
     ]
 }, {
     method: "delete",
