@@ -31,4 +31,6 @@ export class Users {
     @ManyToOne(type => AccountRoles, account_role => account_role.id, { nullable: false })
     account_role: number
 
+    @Column({type: "boolean", default: false, nullable: false})
+    verified: boolean
 }

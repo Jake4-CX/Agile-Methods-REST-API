@@ -4,15 +4,18 @@ import { Users } from "../entity/Users"
 import { verify, sign } from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid';
 import { RefreshTokens } from '../entity/RefreshTokens';
-import { recaptcha_secret_key } from '../config';
 import axios from 'axios';
+import { Verification } from '../entity/Verification';
+import { sendEmail } from '../utils/email';
 const bcrypt = require('bcrypt');
 var createError = require('http-errors');
+import * as config from '../config';
 
 export class UserController {
 
     private userRepository = AppDataSource.getRepository(Users)
     private refreshTokenRepository = AppDataSource.getRepository(RefreshTokens)
+    private verificationRepository = AppDataSource.getRepository(Verification)
 
     async all(request: Request, response: Response, next: NextFunction) {
         // todo, delete password from response
@@ -57,7 +60,7 @@ export class UserController {
         const { user_email, user_password, recaptcha_token } = request.body;
 
         // Verify recaptcha_token - google docs for recaptcha v2 informs users to POST the paramaters, but for some reason this doesn't work   
-        const recaptchaVerifyResponse = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${recaptcha_secret_key}&response=${recaptcha_token}`);
+        const recaptchaVerifyResponse = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${config.recaptcha_secret_key}&response=${recaptcha_token}`);
 
         if (!recaptchaVerifyResponse.data.success) {
             return next(createError(401, "reCAPTCHA verification failed!"));
@@ -76,6 +79,8 @@ export class UserController {
 
         delete user.user_password;
 
+        if (user.verified == false) return next(createError(401, "Please verify your email address before logging in."));
+
         const tokens = await this.createTokens(user)
 
         if (tokens == null) return next(createError(500, "An error occurred while logging in."));
@@ -87,7 +92,7 @@ export class UserController {
     async register(request: Request, response: Response, next: NextFunction) {
         let { user_email, user_password, first_name, last_name, recaptcha_token } = request.body;
 
-        const recaptchaVerifyResponse = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${recaptcha_secret_key}&response=${recaptcha_token}`);
+        const recaptchaVerifyResponse = await axios.post(`https://www.google.com/recaptcha/api/siteverify?secret=${config.recaptcha_secret_key}&response=${recaptcha_token}`);
 
         if (!recaptchaVerifyResponse.data.success) {
             return next(createError(401, "reCAPTCHA verification failed!"));
@@ -114,6 +119,18 @@ export class UserController {
         });
 
         const db_response: Users = await this.userRepository.save(user);
+
+        // create verification code and store in database
+
+        const verification = Object.assign(new Verification(), {
+            verification_uuid: uuidv4(),
+            verification_type: VerificationType.email_verification,
+            user: db_response
+        });
+
+        await this.verificationRepository.save(verification);
+
+        await sendEmail(user_email, "Verify your email address", `Please click the link below to verify your email address: \n\n ${config.site_base_url}/verify/${verification.verification_uuid}`);
 
         delete db_response.user_password;
         delete db_response.last_login_date;

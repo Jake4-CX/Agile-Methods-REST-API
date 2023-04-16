@@ -4,6 +4,7 @@ import { ReportController } from "./controller/ReportController";
 import { ReportTypeController } from "./controller/ReportTypeController";
 import { ReportVoteController } from "./controller/ReportVoteController";
 import { UserController } from "./controller/UserController"
+import { VerificationController } from "./controller/VerificationController";
 
 export const Routes = [{
     method: "post",
@@ -196,4 +197,45 @@ export const Routes = [{
     validation: [
         param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
     ]
+}, { // startOf: resetPassword
+    method: "post",
+    route: "/users/reset_password",
+    controller: VerificationController,
+    action: "request_password_reset",
+    authorization: false,
+    allowed_roles: [],
+    validation: [
+        body('user_email').isEmail().withMessage("user_email must be a valid email address").notEmpty().withMessage("user_email must not be empty"),
+    ],
+}, {
+    method: "post",
+    route: "/users/reset_password/:verification_uuid",
+    controller: VerificationController,
+    action: "verify_password_reset",
+    authorization: false,
+    allowed_roles: [],
+    validation: [
+        body('new_password').isString().withMessage("new_password must be a string").notEmpty().withMessage("new_password must not be empty"),
+        param('verification_uuid').isUUID().withMessage("verification_uuid must be a uuid").notEmpty().withMessage("verification_uuid must not be empty"),
+    ],
+}, {
+    method: "get",
+    route: "/users/reset_password/:verification_uuid",
+    controller: VerificationController,
+    action: "check_password_reset",
+    authorization: false,
+    allowed_roles: [],
+    validation: [
+        param('verification_uuid').isUUID().withMessage("verification_uuid must be a uuid").notEmpty().withMessage("verification_uuid must not be empty"),
+    ],
+}, { // startOf: verifyEmail
+    method: "get",
+    route: "/users/verify_email/:verification_uuid",
+    controller: VerificationController,
+    action: "verify_email",
+    authorization: false,
+    allowed_roles: [],
+    validation: [
+        param('verification_uuid').isUUID().withMessage("verification_uuid must be a uuid").notEmpty().withMessage("verification_uuid must not be empty"),
+    ],
 }]
