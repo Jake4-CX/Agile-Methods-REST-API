@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SITE_BASE_URL: ${{ secrets.SITE_BASE_URL }}
   
     strategy:
       matrix:
