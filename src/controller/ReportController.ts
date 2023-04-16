@@ -8,6 +8,8 @@ import { ImageGroups } from "../entity/ImageGroups";
 import { Users } from "../entity/Users";
 import { ReportVotes } from "../entity/ReportVotes";
 import { Images } from "../entity/Images";
+import { sendEmail } from "../utils/email";
+import * as config from "../config";
 
 export class ReportController {
 
@@ -129,7 +131,11 @@ export class ReportController {
       user: request.user_data.id
     })
 
-    await this.reportRepository.save(report)
+    const resp = await this.reportRepository.save(report)
+
+    if (!resp) return next(createError(401, "A report couldn't be created")); // A report couldn't be created
+
+    sendEmail(report.user.user_email, "Report Created", `Your <a href='${config.site_base_url}/reports/${report.report_uuid}'>report</a> has been created successfully`);
 
     return report;
   }
