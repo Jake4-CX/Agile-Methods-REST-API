@@ -68,7 +68,7 @@ export class UserController {
 
         const user: Users = await this.userRepository.findOne({
             where: { user_email },
-            relations: ["account_role"]
+            relations: ["account_role", "address"]
         });
 
         if (!user) return next(createError(401, "Invalid Email or Password!")); // A user does not exist with this email address

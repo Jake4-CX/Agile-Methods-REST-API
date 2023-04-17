@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne, JoinColumn } from "typeorm"
 import { AccountRoles } from "./AccountRoles";
+import { Addresses } from "./Addresses";
 
 @Entity()
 export class Users {
@@ -30,6 +31,10 @@ export class Users {
 
     @ManyToOne(type => AccountRoles, account_role => account_role.id, { nullable: false })
     account_role: number
+
+    @OneToOne(type => Addresses, address => address.id, { nullable: true })
+    @JoinColumn()
+    address: Addresses
 
     @Column({type: "boolean", default: false, nullable: false})
     verified: boolean

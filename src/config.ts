@@ -13,6 +13,6 @@ export const database_password = process.env.DATABASE_PASSWORD || "4*CMgmdI6uv@"
 export const recaptcha_secret_key = process.env.RECAPTCHA_SECRET_KEY || '';
 
 export const email_host = process.env.EMAIL_HOST || "redbull.mxrouting.net";
-export const email_port = process.env.EMAIL_USE_SSL.toLocaleLowerCase() == "true" ? 465 : 587;
+export const email_port = process.env.EMAIL_USE_SSL.toLocaleLowerCase() == "true" ? 465 : 587 || 465;
 export const email_username = process.env.EMAIL_HOST_USER || "";
 export const email_password = process.env.EMAIL_HOST_PASSWORD || "";

@@ -1,8 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToOne } from "typeorm"
 import { ImageGroups } from "./ImageGroups"
 import { Images } from "./Images"
 import { ReportTypes } from "./ReportTypes"
 import { Users } from "./Users"
+import { Addresses } from "./Addresses"
 
 @Entity()
 export class Reports {
@@ -39,6 +40,10 @@ export class Reports {
 
     @ManyToOne(type => Users, user => user.id, { nullable: false })
     user: Users
+
+    @OneToOne(type => Addresses, address => address.id, { nullable: true })
+    @JoinColumn()
+    address: Addresses
     
   report_votes?: { upvotes: number; downvotes: number }
   report_images?: Images[]

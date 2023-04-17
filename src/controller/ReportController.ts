@@ -10,19 +10,23 @@ import { ReportVotes } from "../entity/ReportVotes";
 import { Images } from "../entity/Images";
 import { sendEmail } from "../utils/email";
 import * as config from "../config";
+import { Addresses } from "../entity/Addresses";
+import { coordinatesToAddress } from "../utils/address";
 
 export class ReportController {
 
   private reportRepository = AppDataSource.getRepository(Reports)
   private reportVoteRepository = AppDataSource.getRepository(ReportVotes)
   private imageRepository = AppDataSource.getRepository(Images)
+  private addressesRepository = AppDataSource.getRepository(Addresses)
+  private userRepository = AppDataSource.getRepository(Users)
 
   async get_all_reports(request: Request, response: Response, next: NextFunction) {
     const reports: Reports[] = await this.reportRepository.find({
       order: {
         report_date: "DESC"
       },
-      relations: ["report_type", "image_group", "user"]
+      relations: ["report_type", "image_group", "user", "address"]
     });
 
     for (let report of reports) {
@@ -49,7 +53,7 @@ export class ReportController {
 
     const report: Reports = await this.reportRepository.findOne({
       where: { report_uuid },
-      relations: ["report_type", "image_group", "user"]
+      relations: ["report_type", "image_group", "user", "address"]
     })
 
     if (!report) return next(createError(401, "A report couldn't be found that has the given report_uuid")); // A report does not exist with this UUID
@@ -83,7 +87,7 @@ export class ReportController {
 
     const reports: Reports[] = await this.reportRepository.find({
       where: { user: user },
-      relations: ["report_type", "image_group"]
+      relations: ["report_type", "image_group", "address"]
     })
 
     // Add report votes to each report object
@@ -119,6 +123,19 @@ export class ReportController {
 
     if (!image_group_id) return next(createError(401, "An image group couldn't be created for the report")); // An image group couldn't be created for the report
 
+    let address = Object.assign(new Addresses(), {
+      address_latitude: report_latitude,
+      address_longitude: report_longitude,
+    });
+
+    const addrData = await coordinatesToAddress(report_latitude, report_longitude)
+
+    if (addrData) {
+      address = addrData;
+    }
+
+    address = await this.addressesRepository.save(address);
+
     const report: Reports = Object.assign(new Reports(), {
       report_uuid: report_uuid,
       report_type: report_type_id,
@@ -128,14 +145,19 @@ export class ReportController {
       report_severity: report_severity,
       report_status: false,
       image_group: image_group_id,
-      user: request.user_data.id
+      user: request.user_data.id,
+      address: address
     })
 
     const resp = await this.reportRepository.save(report)
 
     if (!resp) return next(createError(401, "A report couldn't be created")); // A report couldn't be created
 
-    sendEmail(report.user.user_email, "Report Created", `Your <a href='${config.site_base_url}/reports/${report.report_uuid}'>report</a> has been created successfully`);
+    const userData = await this.userRepository.findOne({
+      where: { id: request.user_data.id },
+    });
+
+    sendEmail(userData.user_email, "Report Created", `Your <a href='${config.site_base_url}/reports/${report.report_uuid}'>report</a> has been created successfully`);
 
     return report;
   }
