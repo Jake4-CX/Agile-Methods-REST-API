@@ -50,6 +50,17 @@ export const Routes = [{
     validation: []
 }, {
     method: "get",
+    route: "/reports/radius/:latitude/:longitude",
+    controller: ReportController,
+    action: "get_all_reports_within_radius",
+    authorization: false,
+    allowed_roles: [],
+    validation: [
+        param('latitude').isFloat().withMessage("latitude must be a float"),
+        param('longitude').isFloat().withMessage("longitude must be a float")
+    ]
+}, {
+    method: "get",
     route: "/reports/user/:user_id",
     controller: ReportController,
     action: "get_reports_from_user_id",
@@ -238,4 +249,22 @@ export const Routes = [{
     validation: [
         param('verification_uuid').isUUID().withMessage("verification_uuid must be a uuid").notEmpty().withMessage("verification_uuid must not be empty"),
     ],
+}, { // startOf: getUser (Requires Manager+)
+    method: "get",
+    route: "/users/:user_id",
+    controller: UserController,
+    action: "get_user",
+    authorization: true,
+    allowed_roles: ["Manager", "Administrator"],
+    validation: [
+        param('user_id').isInt({min: 0}).withMessage("user_id must be a positive integer"),
+    ]
+}, {
+    method: "get",
+    route: "/users",
+    controller: UserController,
+    action: "get_all_users",
+    authorization: true,
+    allowed_roles: ["Manager", "Administrator"],
+    validation: []
 }]
