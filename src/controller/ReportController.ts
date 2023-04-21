@@ -22,22 +22,32 @@ export class ReportController {
   private userRepository = AppDataSource.getRepository(Users)
 
   async get_all_reports(request: Request, response: Response, next: NextFunction) {
-    const reports: Reports[] = await this.reportRepository.find({
-      order: {
-        report_date: "DESC"
-      },
-      relations: ["report_type", "image_group", "user", "address"]
-    });
+    const reports: Reports[] = await this.reportRepository
+      .createQueryBuilder('report')
+      .orderBy('report_date', 'ASC')
+      .leftJoinAndSelect('report.report_type', 'reportType')
+      .leftJoinAndSelect('report.image_group', 'imageGroup')
+      .leftJoinAndSelect('report.user', 'user')
+      .leftJoinAndSelect('report.address', 'address') // Join the address relationship
+      .leftJoinAndMapMany(
+        "report.report_votes_data",
+        ReportVotes,
+        "report_vote",
+        "report_vote.report = report.id"
+      )
+      .leftJoinAndSelect("report.report_images", "image")
+      .getMany();
 
     for (let report of reports) {
-      let report_votes = await this.reportVoteRepository.findBy({ report: {id: report.id } })
 
-      report.report_votes = {
-        upvotes: report_votes.filter((report_vote) => report_vote.vote_type == 1).length,
-        downvotes: report_votes.filter((report_vote) => report_vote.vote_type == -1).length
+      if (report.report_votes_data) {
+        report.report_votes = {
+          upvotes: report.report_votes_data.filter((report_vote) => report_vote.vote_type == 1).length,
+          downvotes: report.report_votes_data.filter((report_vote) => report_vote.vote_type == -1).length
+        }
+
+        delete report.report_votes_data
       }
-
-      report.report_images = await this.imageRepository.findBy({ image_group: report.image_group })
 
       // Remove the user password and email from the report object
       delete report.user.user_password
@@ -48,24 +58,78 @@ export class ReportController {
     return reports;
   }
 
+  async get_all_reports_within_radius(request: Request, response: Response, next: NextFunction) {
+    let { latitude, longitude } = request.params;
+
+    const radius = 15; // 15 miles
+
+    const reports: Reports[] = await this.reportRepository
+      .createQueryBuilder('report')
+      .addSelect(`(ST_Distance_Sphere(POINT(${latitude}, ${longitude}), POINT(address.address_latitude, address.address_longitude)) / 1609.34)`, `report_distance`)
+      .having(`report_distance < :radius`, { radius })
+      .orderBy('report_distance', 'ASC')
+      .leftJoinAndSelect('report.report_type', 'reportType')
+      .leftJoinAndSelect('report.image_group', 'imageGroup')
+      .leftJoinAndSelect('report.user', 'user')
+      .leftJoinAndSelect('report.address', 'address') // Join the address relationship
+      .leftJoinAndMapMany(
+        "report.report_votes_data",
+        ReportVotes,
+        "report_vote",
+        "report_vote.report = report.id"
+      )
+      .leftJoinAndSelect("report.report_images", "image")
+      .getMany();
+
+    for (let report of reports) {
+
+      if (report.report_votes_data) {
+        report.report_votes = {
+          upvotes: report.report_votes_data.filter((report_vote) => report_vote.vote_type == 1).length,
+          downvotes: report.report_votes_data.filter((report_vote) => report_vote.vote_type == -1).length
+        }
+
+        delete report.report_votes_data
+      }
+
+      // Remove the user password and email from the report object
+      delete report.user.user_password
+      delete report.user.user_email
+      delete report.user.last_name
+    }
+
+    return reports;
+
+  }
+
   async get_report_from_uuid(request: Request, response: Response, next: NextFunction) {
     let { report_uuid } = request.params;
 
-    const report: Reports = await this.reportRepository.findOne({
-      where: { report_uuid },
-      relations: ["report_type", "image_group", "user", "address"]
-    })
+    const report: Reports = await this.reportRepository
+      .createQueryBuilder('report')
+      .where('report.report_uuid = :report_uuid', { report_uuid })
+      .leftJoinAndSelect('report.report_type', 'reportType')
+      .leftJoinAndSelect('report.image_group', 'imageGroup')
+      .leftJoinAndSelect('report.user', 'user')
+      .leftJoinAndSelect('report.address', 'address') // Join the address relationship
+      .leftJoinAndMapMany(
+        "report.report_votes_data",
+        ReportVotes,
+        "report_vote",
+        "report_vote.report = report.id"
+      )
+      .leftJoinAndSelect("report.report_images", "image")
+      .getOne();
 
-    if (!report) return next(createError(401, "A report couldn't be found that has the given report_uuid")); // A report does not exist with this UUID
 
-    let report_votes = await this.reportVoteRepository.findBy({ report: {id: report.id } })
+    if (report.report_votes_data) {
+      report.report_votes = {
+        upvotes: report.report_votes_data.filter((report_vote) => report_vote.vote_type == 1).length,
+        downvotes: report.report_votes_data.filter((report_vote) => report_vote.vote_type == -1).length
+      }
 
-    report.report_votes = {
-      upvotes: report_votes.filter((report_vote) => report_vote.vote_type == 1).length,
-      downvotes: report_votes.filter((report_vote) => report_vote.vote_type == -1).length
+      delete report.report_votes_data
     }
-
-    report.report_images = await this.imageRepository.findBy({ image_group: report.image_group })
 
     // Remove the user password and email from the report object
     delete report.user.user_password
@@ -73,7 +137,6 @@ export class ReportController {
     delete report.user.last_name
 
     return report;
-
 
   }
 
@@ -85,22 +148,40 @@ export class ReportController {
 
     if (!user) return next(createError(401, "A user couldn't be found that has the given user_id")); // A user does not exist with this UUID
 
-    const reports: Reports[] = await this.reportRepository.find({
-      where: { user: user },
-      relations: ["report_type", "image_group", "address"]
-    })
 
-    // Add report votes to each report object
+
+
+    const reports: Reports[] = await this.reportRepository
+      .createQueryBuilder('report')
+      .where('report.user = :user_id', { user_id })
+      .leftJoinAndSelect('report.report_type', 'reportType')
+      .leftJoinAndSelect('report.image_group', 'imageGroup')
+      .leftJoinAndSelect('report.user', 'user')
+      .leftJoinAndSelect('report.address', 'address') // Join the address relationship
+      .leftJoinAndMapMany(
+        "report.report_votes_data",
+        ReportVotes,
+        "report_vote",
+        "report_vote.report = report.id"
+      )
+      .leftJoinAndSelect("report.report_images", "image")
+      .getMany();
 
     for (let report of reports) {
-      let report_votes = await this.reportVoteRepository.findBy({ report: {id: report.id } })
 
-      report.report_votes = {
-        upvotes: report_votes.filter((report_vote) => report_vote.vote_type == 1).length,
-        downvotes: report_votes.filter((report_vote) => report_vote.vote_type == -1).length
+      if (report.report_votes_data) {
+        report.report_votes = {
+          upvotes: report.report_votes_data.filter((report_vote) => report_vote.vote_type == 1).length,
+          downvotes: report.report_votes_data.filter((report_vote) => report_vote.vote_type == -1).length
+        }
+
+        delete report.report_votes_data
       }
 
-      report.report_images = await this.imageRepository.findBy({ image_group: report.image_group })
+      // Remove the user password and email from the report object
+      delete report.user.user_password
+      delete report.user.user_email
+      delete report.user.last_name
     }
 
     if (reports.length == 0) return next(createError(401, "A report couldn't be found that has the given user_id")); // A report does not exist with this UUID
@@ -110,7 +191,7 @@ export class ReportController {
   }
 
   async create_report(request: Request, response: Response, next: NextFunction) {
-    let { report_type_id, report_description, report_latitude, report_longitude, report_severity  } = request.body;
+    let { report_type_id, report_description, report_latitude, report_longitude, report_severity } = request.body;
 
     const report_uuid = uuidv4();
 

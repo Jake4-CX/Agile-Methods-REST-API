@@ -10,42 +10,13 @@ import { sendEmail } from '../utils/email';
 const bcrypt = require('bcrypt');
 var createError = require('http-errors');
 import * as config from '../config';
+import { Reports } from '../entity/Reports';
 
 export class UserController {
 
     private userRepository = AppDataSource.getRepository(Users)
     private refreshTokenRepository = AppDataSource.getRepository(RefreshTokens)
     private verificationRepository = AppDataSource.getRepository(Verification)
-
-    async all(request: Request, response: Response, next: NextFunction) {
-        // todo, delete password from response
-        const users = await this.userRepository.find();
-
-        console.log("UserID from JWT: " + request.user_data.id)
-
-        try {
-            users.forEach(user => {
-                delete user.user_password;
-            })
-        } finally {
-            return users;
-        }
-    }
-
-    async one(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id);
-        console.log("UserID from JWT: " + request.user_data.id)
-
-
-        const user = await this.userRepository.findOne({
-            where: { id }
-        })
-
-        if (!user) {
-            return next(createError(401, "user does not exist"));
-        }
-        return user
-    }
 
     async remove(request: Request, response: Response, next: NextFunction) {
         const id = parseInt(request.params.id)
@@ -170,5 +141,66 @@ export class UserController {
         if (response !== null) return ({ accessToken, refreshToken })
 
         return null
+    }
+
+    async get_user(request: Request, response: Response, next: NextFunction) {
+        // const user = await this.userRepository.findOne({
+        //     where: { id: request.user_data.id },
+        //     relations: ["account_role", "address"]
+        // });
+
+        const { user_id } = request.params;
+
+        const user = await this.userRepository
+            .createQueryBuilder("user")
+            .leftJoinAndSelect("user.address", "address")
+            .leftJoinAndSelect("user.account_role", "account_role")
+            .leftJoinAndMapMany(
+                "user.reports",
+                Reports,
+                "reports",
+                "reports.user_id = user.id"
+            )
+            .leftJoinAndSelect("reports.report_type", "report_type")
+            .where("user.id = :id", { id: user_id })
+            .getOne();
+
+        if (!user) return next(createError(401, "User does not exist."));
+
+        delete user.user_password;
+
+        return user
+    }
+
+    async get_all_users(request: Request, response: Response, next: NextFunction) {
+
+        const users: Users[] = await this.userRepository
+            .createQueryBuilder("user")
+            .leftJoinAndSelect("user.address", "address")
+            .leftJoinAndSelect("user.account_role", "account_role")
+            .leftJoinAndMapMany(
+                "user.reports",
+                Reports,
+                "reports",
+                "reports.user_id = user.id"
+            )
+            .leftJoinAndSelect("reports.report_type", "report_type")
+            .getMany();
+
+        if (!users) return next(createError(401, "No users exist."));
+
+        for (let user of users) {
+            delete user.user_password;
+
+            user.report_info = {
+                total_reports: user.reports.length,
+                total_reports_open: user.reports.filter(report => report.report_status == false).length,
+                total_reports_closed: user.reports.filter(report => report.report_status == true).length
+            }
+
+            delete user.reports;
+        }
+
+        return users
     }
 }

@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne, JoinColumn } from "typeorm"
 import { AccountRoles } from "./AccountRoles";
 import { Addresses } from "./Addresses";
+import { Reports } from "./Reports";
 
 @Entity()
 export class Users {
@@ -38,4 +39,7 @@ export class Users {
 
     @Column({type: "boolean", default: false, nullable: false})
     verified: boolean
+
+    reports?: Reports[]
+    report_info?: { total_reports: number, total_reports_open: number, total_reports_closed: number }
 }
