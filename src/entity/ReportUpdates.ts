@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
 import { ImageGroups } from "./ImageGroups"
 import { Reports } from "./Reports"
 import { Users } from "./Users"
+import { Images } from "./Images"
 
 @Entity()
 export class ReportUpdates {
@@ -10,10 +11,10 @@ export class ReportUpdates {
   id: number
 
   @ManyToOne(type => Users, user => user.id, { nullable: false })
-  user: number
+  user: Users
 
   @ManyToOne(type => Reports, report => report.id, { nullable: false })
-  report: number
+  report: Reports
 
   @Column()
   report_update_text: string
@@ -23,4 +24,6 @@ export class ReportUpdates {
 
   @ManyToOne(type => ImageGroups, imageGroups => imageGroups.id, { nullable: false, onDelete: "CASCADE" })
   image_group: number
+
+  update_images?: Images[]
 }

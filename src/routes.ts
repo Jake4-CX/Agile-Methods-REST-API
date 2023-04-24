@@ -6,6 +6,7 @@ import { ReportVoteController } from "./controller/ReportVoteController";
 import { UserController } from "./controller/UserController"
 import { VerificationController } from "./controller/VerificationController";
 import { AssignedReportController } from "./controller/AssignedReportController";
+import { ReportUpdateController } from "./controller/ReportUpdateController";
 
 export const Routes = [{
     method: "post",
@@ -326,7 +327,7 @@ export const Routes = [{
     allowed_roles: ["Employee", "Manager", "Administrator"],
     validation: [],
 }, { // mark assigned report as complete (Requires Employee+)
-    method: "put",
+    method: "post",
     route: "/reports/uuid/:report_uuid/assigned/complete",
     controller: AssignedReportController,
     action: "mark_assigned_report_complete",
@@ -334,5 +335,26 @@ export const Routes = [{
     allowed_roles: ["Employee", "Manager", "Administrator"],
     validation: [
         param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
+    ]
+}, { // report updates (getting from report uuid)
+    method: "get",
+    route: "/reports/uuid/:report_uuid/updates",
+    controller: ReportUpdateController,
+    action: "get_report_updates_from_report_uuid",
+    authorization: false,
+    allowed_roles: [],
+    validation: [
+        param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
+    ]
+}, {
+    method: "post",
+    route: "/reports/uuid/:report_uuid/updates",
+    controller: ReportUpdateController,
+    action: "create_report_update",
+    authorization: true,
+    allowed_roles: ["Employee", "Manager", "Administrator"],
+    validation: [
+        param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
+        body('report_update_text').isString().withMessage("report_update_text must be a string").notEmpty().withMessage("report_update_text must not be empty"),
     ]
 }]
