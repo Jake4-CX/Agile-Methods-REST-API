@@ -12,6 +12,7 @@ import { sendEmail } from "../utils/email";
 import * as config from "../config";
 import { Addresses } from "../entity/Addresses";
 import { coordinatesToAddress } from "../utils/address";
+import { AssignedReports } from "../entity/AssignedReports";
 
 export class ReportController {
 
@@ -241,6 +242,54 @@ export class ReportController {
     sendEmail(userData.user_email, "Report Created", `Your <a href='${config.site_base_url}/reports/${report.report_uuid}'>report</a> has been created successfully`);
 
     return report;
+  }
+
+  async get_all_unassigned_reports(request: Request, response: Response, next: NextFunction) {
+
+    const reports: Reports[] = await this.reportRepository
+      .createQueryBuilder('report')
+      .where('report.report_status = :report_status', { report_status: false })
+      .leftJoinAndSelect('report.report_type', 'reportType')
+      .leftJoinAndSelect('report.image_group', 'imageGroup')
+      .leftJoinAndSelect('report.user', 'user')
+      .leftJoinAndSelect('report.address', 'address') // Join the address relationship
+      .leftJoinAndMapMany(
+        "report.report_votes_data",
+        ReportVotes,
+        "report_vote",
+        "report_vote.report = report.id"
+      )
+      .leftJoinAndMapOne(
+        "report.assigned_report",
+        AssignedReports,
+        "assigned_report",
+        "assigned_report.report = report.id",
+
+      )
+      .leftJoinAndSelect("report.report_images", "image")
+      .andWhere('assigned_report.id IS NULL')
+      .orderBy('report.report_date', 'DESC')
+      .getMany();
+
+    for (let report of reports) {
+
+      if (report.report_votes_data) {
+        report.report_votes = {
+          upvotes: report.report_votes_data.filter((report_vote) => report_vote.vote_type == 1).length,
+          downvotes: report.report_votes_data.filter((report_vote) => report_vote.vote_type == -1).length
+        }
+
+        delete report.report_votes_data
+      }
+
+      // Remove the user password and email from the report object
+      delete report.user.user_password
+      delete report.user.user_email
+      delete report.user.last_name
+    }
+
+    return reports;
+
   }
 
 }

@@ -5,6 +5,7 @@ import { ReportTypeController } from "./controller/ReportTypeController";
 import { ReportVoteController } from "./controller/ReportVoteController";
 import { UserController } from "./controller/UserController"
 import { VerificationController } from "./controller/VerificationController";
+import { AssignedReportController } from "./controller/AssignedReportController";
 
 export const Routes = [{
     method: "post",
@@ -267,4 +268,71 @@ export const Routes = [{
     authorization: true,
     allowed_roles: ["Manager", "Administrator"],
     validation: []
+}, { // startOf get_all_unassigned_reports (Requires Manager+)
+    method: "get",
+    route: "/reports/all/unassigned",
+    controller: ReportController,
+    action: "get_all_unassigned_reports",
+    authorization: true,
+    allowed_roles: ["Manager", "Administrator"],
+    validation: []
+}, {
+    method: "get",
+    route: "/users/role/:role_id",
+    controller: UserController,
+    action: "get_all_users_with_role",
+    authorization: true,
+    allowed_roles: ["Manager", "Administrator"],
+    validation: [
+        param('role_id').isInt({min: 0}).withMessage("role_id must be a positive integer"),
+    ]
+}, { // Assigning a report to a user
+    method: "post",
+    route: "/reports/uuid/:report_uuid/assign/",
+    controller: AssignedReportController,
+    action: "assign_report_to_user",
+    authorization: true,
+    allowed_roles: ["Manager", "Administrator"],
+    validation: [
+        param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
+        body('user_id').isInt({min: 0}).withMessage("user_id must be a positive integer"),
+    ]
+}, { // get user's assigned reports (Requires Manager+)
+    method: "get",
+    route: "/users/:user_id/reports/assigned/unresolved",
+    controller: AssignedReportController,
+    action: "get_users_uncomplete_assigned_reports",
+    authorization: true,
+    allowed_roles: ["Manager", "Administrator"],
+    validation: [
+        param('user_id').isInt({min: 0}).withMessage("user_id must be a positive integer"),
+    ]
+}, {
+    method: "get",
+    route: "/users/:user_id/reports/assigned",
+    controller: AssignedReportController,
+    action: "get_users_assigned_reports",
+    authorization: true,
+    allowed_roles: ["Manager", "Administrator"],
+    validation: [
+        param('user_id').isInt({min: 0}).withMessage("user_id must be a positive integer"),
+    ]
+}, { // get user's (request senders) assigned reports (Requires Employee+)
+    method: "get",
+    route: "/reports/assigned",
+    controller: AssignedReportController,
+    action: "get_user_assigned_reports",
+    authorization: true,
+    allowed_roles: ["Employee", "Manager", "Administrator"],
+    validation: [],
+}, { // mark assigned report as complete (Requires Employee+)
+    method: "put",
+    route: "/reports/uuid/:report_uuid/assigned/complete",
+    controller: AssignedReportController,
+    action: "mark_assigned_report_complete",
+    authorization: true,
+    allowed_roles: ["Employee", "Manager", "Administrator"],
+    validation: [
+        param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
+    ]
 }]
