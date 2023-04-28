@@ -92,6 +92,11 @@ export class UserController {
 
 		const db_response: Users = await this.userRepository.save(user);
 
+		enum VerificationType {
+			"email_verification" = 1,
+			"password_reset" = 2
+		}
+
 		// create verification code and store in database
 
 		const verification = Object.assign(new Verification(), {
