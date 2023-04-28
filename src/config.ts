@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 export const port = process.env.PORT || 3000;
-export const site_base_url = process.env.SITE_BASE_URL || "http://127.0.0.1:5173";
+export const site_base_url = process.env.SITE_BASE_URL || "https://ct503823grp2-ct5038.uogs.co.uk";
 
 export const database_type = process.env.DATABASE_TYPE || "mariadb";
 export const database_address = process.env.DATABASE_ADDRESS || "127.0.0.1";
