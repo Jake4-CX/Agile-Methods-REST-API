@@ -31,7 +31,7 @@ export class Users {
     last_login_date: Date
 
     @ManyToOne(type => AccountRoles, account_role => account_role.id, { nullable: false })
-    account_role: number
+    account_role: AccountRoles
 
     @OneToOne(type => Addresses, address => address.id, { nullable: true })
     @JoinColumn()
