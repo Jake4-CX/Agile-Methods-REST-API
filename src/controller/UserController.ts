@@ -12,10 +12,12 @@ var createError = require('http-errors');
 import * as config from '../config';
 import { Reports } from '../entity/Reports';
 import { AssignedReports } from '../entity/AssignedReports';
+import { AccountRoles } from '../entity/AccountRoles';
 
 export class UserController {
 
 	private userRepository = AppDataSource.getRepository(Users)
+	private accountRoleRepository = AppDataSource.getRepository(AccountRoles)
 	private refreshTokenRepository = AppDataSource.getRepository(RefreshTokens)
 	private verificationRepository = AppDataSource.getRepository(Verification)
 
@@ -230,5 +232,22 @@ export class UserController {
 
 
 		return users;
+	}
+
+	async update_user_role(request: Request, response: Response, next: NextFunction) {
+		
+		const { user_id, role_id } = request.params;
+
+		const user = await this.userRepository.findOne({ where: { id: Number(user_id) } });
+
+		if (!user) return next(createError(401, "User does not exist."));
+
+		user.account_role = await this.accountRoleRepository.findOne({ where: { id: Number(role_id) } });
+
+		if (!user.account_role) return next(createError(401, "Role does not exist."));
+
+		await this.userRepository.save(user);
+
+		return { message: "User role updated successfully."};
 	}
 }

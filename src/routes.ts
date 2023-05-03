@@ -69,7 +69,7 @@ export const Routes = [{
     authorization: false,
     allowed_roles: [],
     validation: [
-        param('user_id').isInt({min: 0}).withMessage("user_id must be a positive integer")
+        param('user_id').isInt({ min: 0 }).withMessage("user_id must be a positive integer")
     ]
 }, {
     method: "get",
@@ -89,11 +89,11 @@ export const Routes = [{
     authorization: true,
     allowed_roles: [],
     validation: [
-        body('report_type_id').isInt({min: 0}).withMessage("report_type_id must be a valid integer"),
+        body('report_type_id').isInt({ min: 0 }).withMessage("report_type_id must be a valid integer"),
         body('report_description').isString().withMessage("report_description must be a string").notEmpty().withMessage("report_description must not be empty"),
         body('report_latitude').isFloat().withMessage("report_latitude must be a float").notEmpty().withMessage("report_latitude must not be empty"),
         body('report_longitude').isFloat().withMessage("report_longitude must be a float").notEmpty().withMessage("report_longitude must not be empty"),
-        body('report_severity').isInt({min: 1, max: 10}).withMessage("report_severity must be a valid integer"),
+        body('report_severity').isInt({ min: 1, max: 10 }).withMessage("report_severity must be a valid integer"),
     ]
 }, { // startOf: ReportTypes
     method: "post",
@@ -115,7 +115,7 @@ export const Routes = [{
     authorization: true,
     allowed_roles: ["Administrator"],
     validation: [
-        param('report_type_id').isInt({min: 0}).withMessage("report_type_id must be a positive integer"),
+        param('report_type_id').isInt({ min: 0 }).withMessage("report_type_id must be a positive integer"),
         body('report_type_name').isString().withMessage("report_type_name must be a string").notEmpty().withMessage("report_type_name must not be empty"),
         body('report_type_description').isString().withMessage("report_type_description must be a string").notEmpty().withMessage("report_type_description must not be empty"),
         body('report_type_icon').isString().withMessage("report_type_icon must be a string").notEmpty().withMessage("report_type_icon must not be empty"),
@@ -128,7 +128,7 @@ export const Routes = [{
     authorization: true,
     allowed_roles: ["Administrator"],
     validation: [
-        param('report_type_id').isInt({min: 0}).withMessage("report_type_id must be a positive integer"),
+        param('report_type_id').isInt({ min: 0 }).withMessage("report_type_id must be a positive integer"),
     ]
 }, {
     method: "get",
@@ -146,7 +146,7 @@ export const Routes = [{
     authorization: false,
     allowed_roles: [],
     validation: [
-        param('image_group_id').isInt({min: 0}).withMessage("image_group_id must be a positive integer")
+        param('image_group_id').isInt({ min: 0 }).withMessage("image_group_id must be a positive integer")
     ]
 }, {
     method: "post",
@@ -156,7 +156,7 @@ export const Routes = [{
     authorization: true,
     allowed_roles: [],
     validation: [
-        param('image_group_id').isInt({min: 0}).withMessage("image_group_id must be a positive integer")
+        param('image_group_id').isInt({ min: 0 }).withMessage("image_group_id must be a positive integer")
     ]
 }, { // startOf: reportVotes
     method: "post",
@@ -259,7 +259,18 @@ export const Routes = [{
     authorization: true,
     allowed_roles: ["Manager", "Administrator"],
     validation: [
-        param('user_id').isInt({min: 0}).withMessage("user_id must be a positive integer"),
+        param('user_id').isInt({ min: 0 }).withMessage("user_id must be a positive integer"),
+    ]
+}, {
+    method: "patch",
+    route: "/users/:user_id/:role_id",
+    controller: UserController,
+    action: "update_user_role",
+    authorization: true,
+    allowed_roles: ["Administrator"],
+    validation: [
+        param('user_id').isInt({ min: 0 }).withMessage("user_id must be a positive integer"),
+        param('role_id').isInt({ min: 0 }).withMessage("role_id must be a positive integer"),
     ]
 }, {
     method: "get",
@@ -285,7 +296,7 @@ export const Routes = [{
     authorization: true,
     allowed_roles: ["Manager", "Administrator"],
     validation: [
-        param('role_id').isInt({min: 0}).withMessage("role_id must be a positive integer"),
+        param('role_id').isInt({ min: 0 }).withMessage("role_id must be a positive integer"),
     ]
 }, { // Assigning a report to a user
     method: "post",
@@ -296,7 +307,7 @@ export const Routes = [{
     allowed_roles: ["Manager", "Administrator"],
     validation: [
         param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
-        body('user_id').isInt({min: 0}).withMessage("user_id must be a positive integer"),
+        body('user_id').isInt({ min: 0 }).withMessage("user_id must be a positive integer"),
     ]
 }, { // get user's assigned reports (Requires Manager+)
     method: "get",
@@ -306,7 +317,7 @@ export const Routes = [{
     authorization: true,
     allowed_roles: ["Manager", "Administrator"],
     validation: [
-        param('user_id').isInt({min: 0}).withMessage("user_id must be a positive integer"),
+        param('user_id').isInt({ min: 0 }).withMessage("user_id must be a positive integer"),
     ]
 }, {
     method: "get",
@@ -316,7 +327,7 @@ export const Routes = [{
     authorization: true,
     allowed_roles: ["Manager", "Administrator"],
     validation: [
-        param('user_id').isInt({min: 0}).withMessage("user_id must be a positive integer"),
+        param('user_id').isInt({ min: 0 }).withMessage("user_id must be a positive integer"),
     ]
 }, { // get user's (request senders) assigned reports (Requires Employee+)
     method: "get",
