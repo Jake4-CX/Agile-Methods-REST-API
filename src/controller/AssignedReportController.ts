@@ -5,6 +5,7 @@ import { Users } from "../entity/Users";
 var createError = require('http-errors');
 import { Reports } from "../entity/Reports";
 import { ReportVotes } from "../entity/ReportVotes";
+import { sendEmail } from "../utils/email";
 
 
 export class AssignedReportController {
@@ -126,7 +127,7 @@ export class AssignedReportController {
 
     const { report_uuid } = request.params;
 
-    const report = await this.reportRepository.findOneBy({ report_uuid: report_uuid });
+    const report = await this.reportRepository.findOne({ where: { report_uuid: report_uuid }, relations: ["user"]});
 
     if (!report) return next(createError(401, "Report does not exist."));
 
@@ -143,6 +144,8 @@ export class AssignedReportController {
     assigned_report.report.report_status = true;
 
     const saved_report = await this.reportRepository.save(assigned_report.report);
+
+    sendEmail(report.user.user_email, `Report Complete`, `Your report that was submitted on ${report.report_date} has been marked as complete.`);
 
     if (!saved_report) return next(createError(401, "Failed to mark report as complete."));
 

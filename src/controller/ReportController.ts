@@ -239,7 +239,7 @@ export class ReportController {
       where: { id: request.user_data.id },
     });
 
-    sendEmail(userData.user_email, "Report Created", `Your <a href='${config.site_base_url}/reports/${report.report_uuid}'>report</a> has been created successfully`);
+    await sendEmail(userData.user_email, "Report Created", `Your <a href='${config.site_base_url}/reports/${report.report_uuid}'>report</a> has been created successfully`);
 
     return report;
   }
