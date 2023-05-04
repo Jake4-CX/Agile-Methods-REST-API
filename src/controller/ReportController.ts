@@ -292,4 +292,18 @@ export class ReportController {
 
   }
 
+  async delete_report(request: Request, response: Response, next: NextFunction) {
+    let { report_uuid } = request.params;
+
+    const report = await this.reportRepository.findOne({
+      where: { report_uuid: report_uuid },
+    });
+
+    if (!report) return next(createError(401, "A report couldn't be found that has the given report_id")); // A report does not exist with this UUID
+
+    await this.reportRepository.delete(report);
+
+    return { message: "Report deleted successfully" };
+  }
+
 }
