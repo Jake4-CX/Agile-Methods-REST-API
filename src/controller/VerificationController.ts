@@ -99,7 +99,7 @@ export class VerificationController {
     await this.verificationRepository.save(verification)
 
     // Send an email to the user with a link to reset their password
-    sendEmail(user.user_email, 'Reset Password', `<a href="${config.site_base_url}/reset/${verification.verification_uuid}">Click here to reset your password</a>`)
+    await sendEmail(user.user_email, 'Reset Password', `<a href="${config.site_base_url}/reset/${verification.verification_uuid}">Click here to reset your password</a>`)
 
     return {
       message: "A password reset email has been sent to the user"
