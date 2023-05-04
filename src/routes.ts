@@ -368,4 +368,14 @@ export const Routes = [{
         param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
         body('report_update_text').isString().withMessage("report_update_text must be a string").notEmpty().withMessage("report_update_text must not be empty"),
     ]
+}, {
+    method: "delete",
+    route: "/reports/uuid/:report_uuid",
+    controller: ReportController,
+    action: "delete_report",
+    authorization: true,
+    allowed_roles: ["Manager", "Administrator"],
+    validation: [
+        param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
+    ]
 }]
