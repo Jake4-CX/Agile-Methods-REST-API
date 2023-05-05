@@ -13,6 +13,7 @@ import * as config from "../config";
 import { Addresses } from "../entity/Addresses";
 import { coordinatesToAddress } from "../utils/address";
 import { AssignedReports } from "../entity/AssignedReports";
+import moment = require("moment");
 
 export class ReportController {
 
@@ -304,6 +305,31 @@ export class ReportController {
     await this.reportRepository.delete(report);
 
     return { message: "Report deleted successfully" };
+  }
+
+  async get_report_statistics(request: Request, response: Response, next: NextFunction) {
+    // Return these values: Reports submitted in the last week, Reports completed in the last week & total reports submitted
+
+    const reports_submitted_last_week = await this.reportRepository
+      .createQueryBuilder('report')
+      .where('report.report_date >= :report_date', { report_date: moment().subtract(7, 'days').toDate() })
+      .getCount();
+
+    const reports_completed_last_week = await this.reportRepository
+      .createQueryBuilder('report')
+      .where('report.report_date >= :report_date', { report_date: moment().subtract(7, 'days').toDate() })
+      .andWhere('report.report_status = :report_status', { report_status: true })
+      .getCount();
+
+    const total_reports_submitted = await this.reportRepository
+      .createQueryBuilder('report')
+      .getCount();
+
+    return {
+      reports_submitted_last_week: reports_submitted_last_week,
+      reports_completed_last_week: reports_completed_last_week,
+      total_reports_submitted: total_reports_submitted
+    }
   }
 
 }
