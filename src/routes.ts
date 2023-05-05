@@ -378,4 +378,12 @@ export const Routes = [{
     validation: [
         param('report_uuid').isUUID().withMessage("report_uuid must be a valid UUID"),
     ]
+}, {
+    method: "get",
+    route: "/reports/statistics",
+    controller: ReportController,
+    action: "get_report_statistics",
+    authorization: false,
+    allowed_roles: [],
+    validation: []
 }]
