@@ -109,7 +109,7 @@ export class UserController {
 
 		await this.verificationRepository.save(verification);
 
-		await sendEmail(user_email, "Verify your email address", `Please click the link below to verify your email address: \n\n ${config.site_base_url}/verify/${verification.verification_uuid}`);
+		await sendEmail(user_email, "Verify your email address", `<a href='${config.site_base_url}/verify/${verification.verification_uuid}'>Click here</a> to press the link below to verify your email address: \n\n ${config.site_base_url}/verify/${verification.verification_uuid}`);
 
 		delete db_response.user_password;
 		delete db_response.last_login_date;
