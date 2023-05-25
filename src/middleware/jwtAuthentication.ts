@@ -37,6 +37,8 @@ export const jwtAuthentication = async (req: Request, res: Response, next: Funct
 
     await refreshTokenRepository.delete(refreshToken)
 
+    if (userData.verified === false) return res.status(401).send({ auth: false, message: 'User is not verified.' })
+
     req.user_data = userData
     next()
 
@@ -54,6 +56,8 @@ export const jwtAuthentication = async (req: Request, res: Response, next: Funct
       })
   
       if (!userData) return res.status(500).send({ auth: false, message: 'Incorrect payload data' });
+
+      if (userData.verified === false) return res.status(401).send({ auth: false, message: 'User is not verified.' })
   
       req.user_data = userData
   
@@ -61,11 +65,4 @@ export const jwtAuthentication = async (req: Request, res: Response, next: Funct
     });
   }
 
-}
-
-interface decodedJWT {
-  id: number,
-  email: string,
-  iat: number,
-  exp: number
 }
